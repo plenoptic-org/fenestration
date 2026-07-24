@@ -245,8 +245,8 @@ class TestPooling:
         pw = fen.PoolingWindows(
             scaling,
             rand_img.shape[-2:],
-            min_eccentricity=ecc[0],
-            max_eccentricity=ecc[1],
+            min_ecc=ecc[0],
+            max_ecc=ecc[1],
             num_scales=num_scales,
             window_type=window_type,
         )
