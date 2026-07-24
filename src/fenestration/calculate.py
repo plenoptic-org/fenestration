@@ -1,4 +1,10 @@
-"""Helpfer functions for calculating pooling window components."""
+"""Helpfer functions for calculating pooling window components.
+
+These functions are used in pooling_windows.py which contains the
+PoolingWindows class, or in pooling.py which contains the
+create_pooling_windows module.
+
+"""
 
 import re
 from typing import Literal
@@ -94,16 +100,16 @@ def _eccentricity_window_spacing(
         compute pooling windows (in degrees). Parameter :math:`e_0` in
         equation 11 of the online methods.
     max_ecc
-        The maximum eccentricity, the outer radius of the image (in
-        degrees). Parameter :math:`e_r` in equation 11 of the online
-        methods.
+        The maximum eccentricity, which defines the eccentricity of the
+        outer radius of the image (in degrees). Parameter :math:`e_r` in
+        equation 11 of the online methods.
     n_windows
         The number of log-eccentricity windows we create. ``n_windows``
-        xor ``scaling`` must be set.
+        or ``scaling`` must be set.
     scaling
         The ratio of the eccentricity window's radial full-width at
         half-maximum to eccentricity (see the ``scaling``
-        function). ``n_windows`` xor ``scaling`` must be set.
+        function). ``n_windows`` or ``scaling`` must be set.
     std_dev
         The standard deviation of the Gaussian window. If this is set,
         we compute the scaling value for the Gaussian windows instead of
@@ -136,16 +142,23 @@ def _eccentricity_window_spacing(
     .. math::
 
         s &= t - \frac{1}{t}
+
+    We can multiply by :math: `t` to reorganize the equation:
+
+    .. math::
+
         0 &= t^2 - st - 1
 
-    Then using the quadratic formula:
+    Then using the quadratic formula we can solve for :math: `t` in
+    terms of :math: `s`:
 
     .. math::
 
         t &= \frac{s \pm \sqrt{s^2+4}}{2}
 
     We then substitute back for :math:`t` and drop the negative root
-    because the window spacing is strictly positive.
+    because the window spacing is strictly positive, which gives us an
+    expression for the window spacing, :math: `w_e`.
 
     .. math::
 
@@ -235,7 +248,7 @@ def scaling(
         degrees). Parameter :math:`e_r` in equation 11 of the online
         methods.
     std_dev
-        The standard deviation fo the Gaussian window. If this is set,
+        The standard deviation of the Gaussian window. If this is set,
         we compute the scaling value for the Gaussian windows instead of
         for the cosine ones.
 
@@ -247,11 +260,12 @@ def scaling(
 
     Notes
     -----
-    No equation for the scaling, :math:`s`, was included in the paper,
+    No equation for the scaling, :math:`s`, was included in the paper [1]_,
     so we derived this ourselves. To start, we note that the window
     function equation (equation 9) reaches its half-max (.5) at
     :math:`x=\pm .5`, and that, as above, we treat :math:`x=0` as the
-    central eccentricity of the window. Then we must solve for these,
+    central eccentricity of the window. Then we must solve for the window's
+    radial full-width as half-maximum and the central eccentricity,
     using the values given within the parentheses in equation 11 as the
     value for :math:`x`, and take their ratios.
 
@@ -273,11 +287,11 @@ def scaling(
         e_h &= e_0 \cdot \exp(w_e(\pm x_h+n+1)) \\
         W &= e_0 (\exp(w_e(n+1+x_h)) - \exp(w_e(n+1-x_h))
 
-    Window's central eccentricity, :math:`e_c`:
+    To calculate the window's central eccentricity, :math:`e_c`, we set
+    :math:`x_h=0`:
 
     .. math::
 
-        0 &= \frac{\log(e_c) -(log(e_0)+w_e(n+1))}{w_e} \\
         e_c &= e_0 \cdot \exp(w_e(n+1))
 
     Then the scaling, :math:`s` is the ratio :math:`\frac{W}{e_c}`:
@@ -291,9 +305,14 @@ def scaling(
         s &= \exp(w_e(n+1+x_h-n-1)) - \exp(w_e(n+1-x_h-n-1)) \\
         s &= \exp(x_h\cdot w_e) - \exp(-x_h\cdot w_e)
 
-    Note that we don't actually use the value returned by
-    ``_windows_eccentricity`` for :math:`e_c`; we simplify
-    it away in the calculation above.
+    Note that we don't actually use the value for :math:`e_c`; we
+    simplify it away in the calculation above.
+
+    References
+    ----------
+    .. [1] Freeman, J., & Simoncelli, E. P. (2011). Metamers of the
+        ventral stream. Nature Neuroscience, 14(9),
+        1195–1201. http://dx.doi.org/10.1038/nn.2889
 
     """
     x_half_max = std_dev * np.sqrt(2 * np.log(2)) if std_dev is not None else 0.5
@@ -355,8 +374,10 @@ def _windows_eccentricity(
 
     Notes
     -----
-    For the raised-cosine windows, to find 'min', we solve for the
-    eccentricity where :math:`x=\frac{-(1+t)}{2}` in equation 9:
+    For the raised-cosine windows, to find the minimum eccentricity
+    :math: `e_min`, we solve for the eccentricity where
+    :math:`x=\frac{-(1+t)}{2}` in equation 9, using the eccentricity
+    formulation in equation 11:
 
     .. math::
 
@@ -371,8 +392,9 @@ def _windows_eccentricity(
         \frac{(1+t)}{2} &= \frac{\log(e_{max}) -(\log(e_0)+w_e(n+1))}{w_e} \\
         e_{max} &= \exp{\frac{w_e(1+t)}{2} + \log(e_0) + w_e(n+1)}
 
-    For either raised-cosine or gaussian windows, to find 'central', we
-    solve for the eccentricity where :math:`x=0` in equation 9:
+    For either raised-cosine or gaussian windows, to find the central
+    eccentricity :math: `e_c`, we solve for the eccentricity where
+    :math:`x=0` in equation 9:
 
     .. math::
 
@@ -472,9 +494,11 @@ def _window_widths_actual(
     and radial widths of each set of windows (in degrees).
 
     We return four total widths, two by two for radial and angular by
-    'top' and 'full'. By 'top', we mean the width of the flat-top region
-    of each window (where the windows value is 1), and by 'full', we
-    mean the width of the entire window
+    'top' and 'full'. For raised-cosine windows, by 'top', we mean the
+    width of the flat-top region of each window (where the windows value
+    is 1), and by 'full', we mean the width of the entire window. For
+    gaussian windows, the 'top' width is 0, because there is no flat top
+    region. The 'full' width is defined as 3 standard deviations.
 
     Parameters
     ----------
@@ -493,7 +517,7 @@ def _window_widths_actual(
         degrees). Parameter :math:`e_r` in equation 11 of the online
         methods.
     window_type
-        Whether to use the raised cosine function from [1]_ or a
+        Whether to use the raised cosine function from [2]_ or a
         Gaussian that has approximately the same structure. If cosine,
         ``transition_region_width`` must be set; if gaussian, then
         ``std_dev`` must be set
@@ -635,12 +659,12 @@ def _window_widths_actual(
     )
 
 
-def deg_to_pix(img_res: tuple[int, int], max_eccentricity: float = 15) -> float:
+def deg_to_pix(img_res: tuple[int, int], max_ecc: float = 15) -> float:
     r"""Calculate the degree-to-pixel conversion factor.
 
     We assume ``img_res`` is the full resolution of the image and
-    ``max_eccentricity`` is the radius of the image in degrees. Thus, we
-    divide half of ``img_res`` by ``max_eccentricity``. However, we want
+    ``max_ecc`` is the radius of the image in degrees. Thus, we
+    divide half of ``img_res`` by ``max_ecc``. However, we want
     to be able to handle non-square images, so we assume the value you
     want to use is the max of the two numbers in ``img_res`` (this is
     the way we construct the PoolingWindow objects; we want the windows
@@ -651,7 +675,7 @@ def deg_to_pix(img_res: tuple[int, int], max_eccentricity: float = 15) -> float:
     img_res
         The resolution of our image (should therefore contains
         integers).
-    max_eccentricity
+    max_ecc
         The eccentricity (in degrees) of the edge of the image
 
     Returns
@@ -662,13 +686,13 @@ def deg_to_pix(img_res: tuple[int, int], max_eccentricity: float = 15) -> float:
         deg_to_pix to get it in pixels
 
     """
-    return (np.max(img_res) / 2) / max_eccentricity
+    return (np.max(img_res) / 2) / max_ecc
 
 
 def _min_eccentricity(
     scaling: float,
     img_res: tuple[int, int],
-    max_eccentricity: float = 15,
+    max_ecc: float = 15,
     pixel_area_thresh: float = 1,
     radial_to_circumferential_ratio: float = 2,
 ) -> tuple[float, float]:
@@ -711,10 +735,7 @@ def _min_eccentricity(
     ----------
     scaling
         Scaling parameter that governs the size of the pooling
-        windows. Other pooling windows parameters
-        (``radial_to_circumferential_ratio``,
-        ``transition_region_width``) cannot be set here. If that ends up
-        being of interest, will change that.
+        windows.
     img_res
         The resolution of our image (should therefore contains
         integers).
@@ -733,7 +754,7 @@ def _min_eccentricity(
         of polar angle windows, we round the resulting number of polar
         angle windows to the nearest integer, so the ratio in the
         generated windows approximate this. 2 (the default) is the value
-        used in the paper [1]_.
+        used in the paper [2]_.
 
     Returns
     -------
@@ -746,12 +767,12 @@ def _min_eccentricity(
 
     References
     ----------
-    .. [1] Freeman, J., & Simoncelli, E. P. (2011). Metamers of the
+    .. [2] Freeman, J., & Simoncelli, E. P. (2011). Metamers of the
        ventral stream. Nature Neuroscience, 14(9),
        1195–1201. http://dx.doi.org/10.1038/nn.2889
 
     """
-    degtopix = deg_to_pix(img_res, max_eccentricity)
+    degtopix = deg_to_pix(img_res, max_ecc)
     # see docstring for why we use this formula, but we're computing the
     # coefficients of a quadratic equation as a function of eccentricity
     # and use np.roots to find its roots
