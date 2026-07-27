@@ -495,6 +495,7 @@ def create_pooling_windows(
     To use, simply call with the desired scaling and image size (for the
     version seen in the paper, don't change any of the default arguments;
     compare this image to the right side of Supplementary Figure 1C).
+
     Although we have hard-coded the standard deviation (to 1, for
     ``window_type="gaussian"``) and transition region width (to 0.5, for
     ``window_type="cosine"``) when creating the ``PoolingWindows`` object, it is
@@ -535,7 +536,7 @@ def create_pooling_windows(
     you must also normalize resulting windows so they have an L1-norm of 1. This
     is useful when generating model metamers using the windows' representation
     so that each eccentricity contributes equally, facilitating optimization.
-    See [7]_ for an example:
+    See [7]_ for an example.
 
     You can display the various angle and eccentricity windows by plotting a
     specified index:
@@ -546,19 +547,13 @@ def create_pooling_windows(
 
        >>> import fenestration as fen
        >>> import matplotlib.pyplot as plt
-       >>> angle_w, ecc_w = fen.create_pooling_windows(
-       ...     0.8,
-       ...     (256, 256),
-       ...     window_type="cosine",
-       ...     transition_region_width=0.5,
-       ...     std_dev=None,
-       ... )
+       >>> import pooling
+       >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
        >>> fig, ax = plt.subplots(1, 2, figsize=(8, 4))
        >>> ax[0].imshow(ecc_w[0], cmap="Grays_r", interpolation="none")
        <matplotlib.image.AxesImage ...>
        >>> ax[1].imshow(angle_w[0], cmap="Grays_r", interpolation="none")
        <matplotlib.image.AxesImage ...>
-       >>> plt.show()
 
     If you wish to get the windows as shown in Supplementary Figure 1C
     in the paper [6]_, use ``torch.einsum`` (if you wish to apply these
@@ -571,23 +566,17 @@ def create_pooling_windows(
 
        >>> import fenestration as fen
        >>> import torch
-       >>> angle_w, ecc_w = fen.create_pooling_windows(
-       ...     0.8,
-       ...     (256, 256),
-       ...     window_type="cosine",
-       ...     transition_region_width=0.5,
-       ...     std_dev=None,
-       ... )
+       >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
        >>> # we ignore the last ring of eccentricity windows here because
        >>> # they're all relatively small, which makes the following plot
        >>> # look weird. for how to properly handle them, see the
        >>> # PoolingWindows class
        >>> windows = torch.einsum("ahw,ehw->eahw", [angle_w, ecc_w[:-1]]).flatten(0, 1)
-       >>> fig, ax = plt.subplots(figsize=(5, 5))
+       >>> fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+       >>> # we use the intersecting amplitude value for gaussian windows, 0.14
        >>> for w in windows:
-       ...     ax.contour(w, [0.5], colors="r")
+       ...     ax.contour(w, [0.14], colors="r")
        <matplotlib.contour.QuadContourSet ...>
-       >>> plt.show()
 
     See Also
     --------
