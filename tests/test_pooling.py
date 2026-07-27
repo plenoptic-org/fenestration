@@ -13,24 +13,26 @@ from conftest import DEVICE
 
 def unpack_dict(pw):
     pw_dict = pw.__dict__
+    new_dict = {}
     for k, v in pw_dict.items():
         if k.startswith(("_", "training")):
             continue
         else:
             # check if dictionary
             if isinstance(v, dict):
-                pw_dict = {**pw_dict, k: list(v.values())}
+                new_dict.update({f"{k}_{k_}": v_ for k_, v_ in v.items()})
             # check if list of dictionaries and concat with new keys
             elif isinstance(v, list) and v and isinstance(v[0], dict):
-                listofdicts = {}
                 for num, d in enumerate(pw_dict[k]):
-                    listofdicts.update({f"{k}_{num}_{k_}": v_ for k_, v_ in d.items()})
-                pw_dict = {**pw_dict, k: list(listofdicts.values())}
-            # if not dictionary, just copy
+                    new_dict.update({f"{k}_{num}_{k_}": v_ for k_, v_ in d.items()})
+            # check if list of numpy arrays and concat with new keys
+            elif isinstance(v, list) and v and isinstance(v[0], np.ndarray):
+                new_dict.update({f"{k}_{k_}": v_ for k_, v_ in enumerate(v)})
+            # if none of the above, just copy
             else:
-                pw_dict[k] = v
+                new_dict[k] = v
 
-    return pw_dict
+    return new_dict
 
 
 class TestPooling:
@@ -233,12 +235,21 @@ class TestPooling:
         pw.save(tmp_path / "model.pt")
         new_path = tmp_path / "newdir"
         new_path.mkdir()
-        pw_load = pooling.PoolingWindows.load(
-            tmp_path / "model.pt", cache_dir=tmp_path / "newdir/"
+        # move cached file to new path. only 1 for num_scales=1, could do multiple
+        pathlib.Path(pw.cache_paths[0]).rename(
+            new_path / pathlib.Path(pw.cache_paths[0]).name
         )
-        assert pathlib.Path(pw_load.cache_dir) == pathlib.Path(
-            str(tmp_path) + "/newdir/"
-        )
+        # load using new path where cached file now lives
+        pw_load = pooling.PoolingWindows.load(tmp_path / "model.pt", cache_dir=new_path)
+        assert pathlib.Path(pw_load.cache_dir) == new_path
+        assert pathlib.Path(new_path / pathlib.Path(pw.cache_paths[0]).name).exists()
+        assert pathlib.Path(new_path / pathlib.Path(pw.cache_paths[0]).name).is_file()
+        assert not pathlib.Path(
+            tmp_path / pathlib.Path(pw.cache_paths[0]).name
+        ).exists()
+        assert not pathlib.Path(
+            tmp_path / pathlib.Path(pw.cache_paths[0]).name
+        ).is_file()
 
     @pytest.mark.parametrize("scaling", [0.5, 1])
     @pytest.mark.parametrize("ecc", [[0.5, 10], [1, 15]])
@@ -265,24 +276,13 @@ class TestPooling:
         pw_new_dict = unpack_dict(pw_new)
 
         for k, v in pw_dict.items():
-            # only test public attributes
-            if k.startswith(("_", "training")):
-                continue
-            # if list, iterate through list and check type for equivalence measure
-            if isinstance(v, list):
-                for idx in range(len(pw_dict[k])):
-                    if isinstance(pw_dict[k][idx], torch.Tensor):
-                        assert torch.allclose(pw_dict[k][idx], pw_new_dict[k][idx])
-                    elif isinstance(pw_dict[k][idx], np.ndarray):
-                        assert np.allclose(pw_dict[k][idx], pw_new_dict[k][idx])
-                    else:
-                        assert pw_dict[k][idx] == pw_new_dict[k][idx]
+            if isinstance(pw_dict[k], (torch.Tensor, np.ndarray)):
+                assert torch.allclose(
+                    torch.as_tensor(pw_dict[k]), torch.as_tensor(pw_new_dict[k])
+                )
             else:
-                # otherwise check individual equivalence or full list
-                try:
-                    assert pw_dict[k] == pw_new_dict[k]
-                except ValueError:
-                    assert (pw_dict[k] == pw_new_dict[k]).all()
+                # otherwise check individual equivalence
+                assert pw_dict[k] == pw_new_dict[k]
 
     @pytest.mark.skipif(DEVICE.type == "cpu", reason="Only makes sense to test on cuda")
     def test_PoolingWindows_saveload_device(self, pool_win, tmp_path):
