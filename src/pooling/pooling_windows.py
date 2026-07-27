@@ -886,8 +886,8 @@ class PoolingWindows(nn.Module):
 
         >>> import pooling
         >>> pw = pooling.PoolingWindows(0.5, (256, 256))
-        >>> pw.save("./saved_data/model_params.pt")
-        >>> pw_new = pooling.PoolingWindows.load("./saved_data/model_params.pt")
+        >>> pw.save("model_params.pt")
+        >>> pw_new = pooling.PoolingWindows.load("model_params.pt")
 
         """
         save_dict = {
