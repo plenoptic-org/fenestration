@@ -461,9 +461,9 @@ def _window_widths_actual(
     radial_window_spacing: float,
     min_ecc: float = 0.5,
     max_ecc: float = 15,
-    window_type: Literal["cosine", "gaussian"] = "cosine",
-    transition_region_width: float | None = 0.5,
-    std_dev: float | None = None,
+    window_type: Literal["cosine", "gaussian"] = "gaussian",
+    transition_region_width: float | None = None,
+    std_dev: float | None = 1,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     r"""Calculate and return the actual widths of the windows.
 

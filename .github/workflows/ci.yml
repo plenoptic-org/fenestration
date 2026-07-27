@@ -38,6 +38,38 @@ jobs:
     - name: Run tests with pytest
       run: |
         pytest --cov-report xml
+  doctests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+      fail-fast: false
+    name: Run doctests
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
+    - name: Install Python 3
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 #v6.2.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: pip
+        cache-dependency-path: setup.py
+    - name: Install dependencies
+      run: |
+        # using the --upgrade and --upgrade-strategy eager flags ensures that
+        # pip will always install the latest allowed version of all
+        # dependencies, to make sure the cache doesn't go stale
+        pip install --upgrade --upgrade-strategy eager .[tests] --extra-index-url https://download.pytorch.org/whl/cpu
+    - name: Run doctests with pytest
+      run: |
+        # 1. ignore warnings in doctests, since otherwise pytest fails (except
+        #    for our custom LoadWarning, which we do some specific working with).
+        # 2. for some reason, much quicker when run in sequence (-n 0) rather
+        #    than parallel.
+        # 3. import-mode=importlib works for doctests (avoiding an import path
+        #    error for src/plenoptic/conftest.py) but not for our regular tests
+        pytest --import-mode=importlib --doctest-continue-on-failure --doctest-modules src/ -W "ignore"
   check_urls:
     runs-on: ubuntu-latest
     name: Check all urls are valid

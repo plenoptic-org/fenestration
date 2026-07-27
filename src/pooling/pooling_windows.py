@@ -61,12 +61,9 @@ class PoolingWindows(nn.Module):
     appropriate cached windows exist before creating them and load them
     if they do. The path we'll use is
     ``{cache_dir}/scaling-{scaling}_size-{img_res}_e0-{min_eccentricity}_
-    em-{max_eccentricity}_w-{window_width}_{window_type}.pt``, where
-    {window_width} is ``transition_region_width`` if
-    ``window_type='cosine'``, and ``std_dev`` if it's
-    ``'gaussian'``. We'll cache each scale separately, changing the
-    img_res (and potentially min_eccentricity) values in that save path
-    appropriately.
+    em-{max_eccentricity}_{window_type}.pt``. We'll cache each scale separately,
+    changing the img_res (and potentially min_eccentricity) values in that save
+    path appropriately.
 
     Parameters
     ----------
@@ -95,19 +92,7 @@ class PoolingWindows(nn.Module):
         don't check for or cache the windows.
     window_type
         Whether to use the raised cosine function from [1]_ or a Gaussian that
-        has approximately the same structure. If cosine,
-        ``transition_region_width`` must be set; if gaussian, then ``std_dev``
-        must be set.
-    transition_region_width
-        The width of the transition region, parameter :math:`t` in
-        equation 9 from the online methods. 0.5 (the default) is the
-        value used in the paper [1]_.
-    std_dev
-        The standard deviation of the Gaussian window. WARNING -- For
-        now, we only support ``std_dev=1`` (in order to ensure that the
-        windows tile correctly, intersect at the proper point, follow
-        scaling, and have proper aspect ratio; not sure we can make that
-        happen for other values).
+        has approximately the same structure.
 
     Attributes
     ----------
@@ -119,11 +104,6 @@ class PoolingWindows(nn.Module):
         The eccentricity at which the pooling windows start.
     max_eccentricity : float
         The eccentricity at which the pooling windows end.
-    transition_region_width : float or None
-        The width of the cosine windows' transition region, parameter
-        :math:`t` in equation 9 from the online methods.
-    std_dev : float or None
-        The standard deviation of the Gaussian windows.
     angle_windows : dict
         A dict of 3d tensors containing the angular pooling windows in
         which the model parameters are averaged. Each key corresponds to
@@ -217,15 +197,27 @@ class PoolingWindows(nn.Module):
         Gaussian that has approximately the same structure.
     window_max_amplitude : float
         The max amplitude of an individual window. This will always be 1
-        for raised-cosine windows, but will depend on ``std_dev`` for
-        gaussian ones (for ``std_dev=1``, the only value we support for
-        now, it's approximately .16).
+        for raised-cosine windows. For gaussian windows, this value depends
+        on the standard deviation, which is currently hard-coded at ``1``.
+        Therefore, for gaussian windows it's approximately 0.16.
     window_intersecting_amplitude : float
         The amplitude at which two neighboring windows intersect. This
-        will always be .5 for raised-cosine windows, but will depend on
-        ``std_dev`` for gaussian ones (for ``std_dev=1``, the only value
-        we support for now, it's half a standard deviation away from the
-        center, approximately .14)
+        will always be .5 for raised-cosine windows, but for gaussian ones,
+        this value depends on the standard deviation. This value is currently
+        hard-coded at ``1``, therefore it's half a standard deviation away from
+        the center, approximately 0.14.
+
+    Notes
+    -----
+    If you are just interested in the eccentricity and angular filters
+    associated with these pooling windows, this is also possible using
+    a combination of ``pooling.pooling.create_pooling_windows`` and
+    ``pooling.pooling.normalize_windows``. See Examples section of
+    ``create_pooling_windows`` for details on this process.
+
+    See Also
+    --------
+    pooling.pooling.create_pooling_windows : create angle and eccentricity windows
 
     References
     ----------
@@ -243,9 +235,7 @@ class PoolingWindows(nn.Module):
         max_eccentricity: float = 15,
         num_scales: int = 1,
         cache_dir: str | None = None,
-        window_type: Literal["cosine", "gaussian"] = "cosine",
-        transition_region_width: float | None = 0.5,
-        std_dev: float | None = None,
+        window_type: Literal["cosine", "gaussian"] = "gaussian",
     ):
         super().__init__()
         if len(img_res) != 2:
@@ -261,28 +251,24 @@ class PoolingWindows(nn.Module):
         self._contract_expr = {}
         self.norm_factor = {}
         if window_type == "cosine":
-            assert transition_region_width is not None, (
-                "cosine windows need transition region widths!"
-            )
-            self.transition_region_width = float(transition_region_width)
-            self.std_dev = None
-            window_width_for_saving = self.transition_region_width
+            self._transition_region_width = 0.5
+            self._std_dev = None
             self.window_max_amplitude = 1
             self.window_intersecting_amplitude = 0.5
         elif window_type == "gaussian":
-            assert std_dev is not None, "gaussian windows need standard deviations!"
-            self.std_dev = float(std_dev)
-            self.transition_region_width = None
-            if std_dev != 1:
-                raise Exception("Only std_dev=1 allowed for Gaussian windows!")
-            window_width_for_saving = self.std_dev
+            self._std_dev = 1
+            self._transition_region_width = None
             # 1 / (std_dev * GAUSSIAN_SUM) is the max in a single
             # direction (radial or angular), so the max for a single
             # window is its square
-            self.window_max_amplitude = (1 / (std_dev * pooling.GAUSSIAN_SUM)) ** 2
+            self.window_max_amplitude = (
+                1 / (self._std_dev * pooling.GAUSSIAN_SUM)
+            ) ** 2
             self.window_intersecting_amplitude = self.window_max_amplitude * np.exp(
                 -0.25 / 2
             )
+        else:
+            raise ValueError("Window types must be either gaussian or cosine!")
         if cache_dir is not None:
             self.cache_dir = op.expanduser(cache_dir)
             if not op.exists(self.cache_dir):
@@ -293,8 +279,8 @@ class PoolingWindows(nn.Module):
             cache_path_template = op.join(
                 self.cache_dir,
                 "scaling-{scaling}_size-{img_res}_"
-                "e0-{min_eccentricity:.03f}_em-{max_eccentricity:.01f}_w"
-                "-{window_width}_{window_type}.pt",
+                "e0-{min_eccentricity:.03f}_em-{max_eccentricity:.01f}_"
+                "{window_type}.pt",
             )
         else:
             self.cache_dir = cache_dir
@@ -307,10 +293,10 @@ class PoolingWindows(nn.Module):
             "img_res": img_res,
             "min_eccentricity": self.min_eccentricity,
             "max_eccentricity": self.max_eccentricity,
-            "transition_region_width": self.transition_region_width,
+            "transition_region_width": self._transition_region_width,
             "cache_dir": self.cache_dir,
             "window_type": window_type,
-            "std_dev": self.std_dev,
+            "std_dev": self._std_dev,
         }
         for i in range(self.num_scales):
             scaled_img_res = [np.ceil(j / 2**i) for j in img_res]
@@ -332,7 +318,6 @@ class PoolingWindows(nn.Module):
                     scaling=scaling,
                     max_eccentricity=self.max_eccentricity,
                     img_res=",".join([str(int(i)) for i in scaled_img_res]),
-                    window_width=window_width_for_saving,
                     window_type=window_type,
                     min_eccentricity=self.min_eccentricity,
                 )
@@ -348,8 +333,8 @@ class PoolingWindows(nn.Module):
                     scaled_img_res,
                     self.min_eccentricity,
                     self.max_eccentricity,
-                    std_dev=self.std_dev,
-                    transition_region_width=self.transition_region_width,
+                    std_dev=self._std_dev,
+                    transition_region_width=self._transition_region_width,
                     window_type=window_type,
                 )
 
@@ -390,9 +375,10 @@ class PoolingWindows(nn.Module):
             # otherwise, use the central one.
             except AttributeError:
                 ecc = self.central_eccentricity_degrees
-            self.ecc_windows, norm_factor = pooling.normalize_windows(
-                self.angle_windows, self.ecc_windows, ecc, i
+            norm_ecc, norm_factor = pooling.normalize_windows(
+                angle_windows, ecc_windows, ecc
             )
+            self.ecc_windows[i] = norm_ecc
             self.norm_factor[i] = norm_factor
 
     def _window_sizes(self):
@@ -411,7 +397,7 @@ class PoolingWindows(nn.Module):
 
         """
         ecc_window_width = pooling.calculate._eccentricity_window_spacing(
-            scaling=self.scaling, std_dev=self.std_dev
+            scaling=self.scaling, std_dev=self._std_dev
         )
         n_polar_windows = int(
             round(pooling.calculate._angular_n_windows(ecc_window_width / 2))
@@ -428,8 +414,8 @@ class PoolingWindows(nn.Module):
             self.min_eccentricity,
             self.max_eccentricity * np.sqrt(2),
             self.window_type,
-            self.transition_region_width,
-            self.std_dev,
+            self._transition_region_width,
+            self._std_dev,
         )
         self.window_width_degrees = dict(
             zip(
@@ -453,7 +439,7 @@ class PoolingWindows(nn.Module):
                     self.n_eccentricity_bands,
                     ecc_window_width,
                     self.min_eccentricity,
-                    std_dev=self.std_dev,
+                    std_dev=self._std_dev,
                 )
             )
         self.window_width_degrees["radial_half"] = (
