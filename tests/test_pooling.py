@@ -23,7 +23,7 @@ class TestPooling:
 
     def test_creation_gaussian(self):
         pooling.pooling.create_pooling_windows(
-            0.87, (100, 100), 0.2, 30, 1.2, "gaussian", std_dev=1
+            0.87, (100, 100), 0.2, 30, 1.2, "gaussian"
         )
 
     @pytest.mark.parametrize("n_windows", [4, 4.5])
@@ -38,7 +38,7 @@ class TestPooling:
 
     @pytest.mark.parametrize("res", [(256, 256), (1000, 1000), 100])
     def test_angle_windows(self, res):
-        pooling.pooling._polar_angle_windows(4, res)
+        pooling.pooling._polar_angle_windows(10, res)
 
     def test_angle_windows_notint(self):
         with pytest.raises(Exception, match="n_windows must be an integer"):
@@ -88,13 +88,11 @@ class TestPooling:
         assert np.isinf(pooling.pooling.calculate.scaling(4, 0))
 
     @pytest.mark.parametrize("num_scales", [1, 3])
-    @pytest.mark.parametrize("transition_region_width", [0.5, 1])
-    def test_PoolingWindows_cosine(self, rand_img, num_scales, transition_region_width):
+    def test_PoolingWindows_cosine(self, rand_img, num_scales):
         pw = pooling.PoolingWindows(
             0.5,
             rand_img.shape[2:],
             num_scales=num_scales,
-            transition_region_width=transition_region_width,
             window_type="cosine",
         )
         pw(rand_img)
@@ -106,30 +104,8 @@ class TestPooling:
             rand_img.shape[2:],
             num_scales=num_scales,
             window_type="gaussian",
-            std_dev=1,
         )
         pw(rand_img)
-        # we only support std_dev=1
-        with pytest.raises(
-            Exception, match="Only std_dev=1 allowed for Gaussian windows!"
-        ):
-            pooling.PoolingWindows(
-                0.5,
-                rand_img.shape[2:],
-                num_scales=num_scales,
-                window_type="gaussian",
-                std_dev=2,
-            )
-        with pytest.raises(
-            Exception, match="Only std_dev=1 allowed for Gaussian windows!"
-        ):
-            pooling.PoolingWindows(
-                0.5,
-                rand_img.shape[2:],
-                num_scales=num_scales,
-                window_type="gaussian",
-                std_dev=0.5,
-            )
 
     def test_PoolingWindows_totype(self, pool_win):
         assert pool_win.angle_windows[0].dtype == torch.float32
@@ -243,8 +219,34 @@ class TestPooling:
             for i in range(num_scales):
                 pw(im[(i,)], idx=i, weights=torch.ones(num_scales, 1, 1, 1, 1))
 
-    def test_PoolingWindows_summarize(self, rand_img, pool_win):
+    def test_PoolingWindows_summarize_gaussian(self, pool_win):
         sizes = pool_win.summarize_window_sizes()
+        assert np.allclose(sizes["min_window_center_degrees"], 0.6169492446746707)
+        assert np.allclose(sizes["min_window_fwhm_degrees"], 0.30847462233733536)
+        assert np.allclose(sizes["min_window_area_degrees"], 0.037367906541873275)
+        assert np.allclose(sizes["max_window_center_degrees"], 14.435802268216328)
+        assert np.allclose(sizes["max_window_fwhm_degrees"], 7.217901134108164)
+        assert np.allclose(sizes["max_window_area_degrees"], 20.458874764448375)
+        assert np.allclose(sizes["min_window_scale_0_center_pixels"], 5.26463355455719)
+        assert np.allclose(sizes["min_window_scale_0_fwhm_pixels"], 2.632316777278595)
+        assert np.allclose(sizes["min_window_scale_0_area_pixels"], 2.721047914586897)
+        assert np.allclose(
+            sizes["max_window_scale_0_center_pixels"], 123.18551268877933
+        )
+        assert np.allclose(sizes["max_window_scale_0_fwhm_pixels"], 61.59275634438966)
+        assert np.allclose(sizes["max_window_scale_0_area_pixels"], 1489.7697961809874)
+        assert np.allclose(sizes["min_window_scale_1_center_pixels"], 2.632316777278595)
+        assert np.allclose(sizes["min_window_scale_1_fwhm_pixels"], 1.3161583886392976)
+        assert np.allclose(sizes["min_window_scale_1_area_pixels"], 0.6802619786467242)
+        assert np.allclose(sizes["max_window_scale_1_center_pixels"], 61.59275634438966)
+        assert np.allclose(sizes["max_window_scale_1_fwhm_pixels"], 30.79637817219483)
+        assert np.allclose(sizes["max_window_scale_1_area_pixels"], 372.44244904524686)
+
+    def test_PoolingWindows_summarize_cosine(self, rand_img):
+        pw = pooling.PoolingWindows(
+            0.5, rand_img.shape[2:], num_scales=2, window_type="cosine"
+        )
+        sizes = pw.summarize_window_sizes()
         assert np.allclose(sizes["min_window_center_degrees"], 0.8201941016011038)
         assert np.allclose(sizes["min_window_fwhm_degrees"], 0.4100970508005519)
         assert np.allclose(sizes["min_window_area_degrees"], 0.06604397097574137)
