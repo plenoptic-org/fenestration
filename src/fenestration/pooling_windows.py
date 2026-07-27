@@ -31,16 +31,19 @@ def __dir__() -> list[str]:
 
 
 class PoolingWindows(nn.Module):
-    r"""Generic class to set up scaling windows for use with other models.
+    r"""Generic class to set up and visualize foveated pooling windows.
 
-    Note that we will calculate the minimum eccentricity at which the
-    area of the windows at half-max exceeds one pixel (based on
-    ``scaling``, ``img_res`` and ``max_ecc``) and, if
-    ``min_ecc`` is below that, will throw an Exception.
+    This generates foveated pooling windows given a small number of
+    parameters. These windows are organized radially into eccentricity
+    bands with the size, shape, and extent of the windows dependent upon
+    the input parameters. These pooling windows can be used to summarize
+    model statistics across visual space, such that information near the
+    central (or foveal) visual field is pooled over smaller regions whereas
+    information near the outer (or peripheral) visual field is pooled over
+    larger regions.
 
-    This just generates the pooling windows given a small number of
-    parameters. One tricky thing we do is generate a set of scaling
-    windows for each scale (appropriately) sized. For example, the V1
+    One tricky thing we do is generate a set of scaling
+    windows for each (appropriately-sized) scale. For example, the V1
     model will have 4 scales, so for a 256 x 256 image, the coefficients
     will have shape (256, 256), (128, 128), (64, 64), and (32,
     32). Therefore, we need windows of the same size (could also
@@ -179,6 +182,11 @@ class PoolingWindows(nn.Module):
 
     Notes
     -----
+    We will calculate the minimum eccentricity at which the
+    area of the windows at half-max exceeds one pixel (based on
+    ``scaling``, ``img_res`` and ``max_ecc``) and, if
+    ``min_ecc`` is below that, will throw an Exception.
+
     If you are just interested in the eccentricity and angular filters
     associated with these pooling windows, this is also possible using
     a combination of ``fen.create_pooling_windows`` and
