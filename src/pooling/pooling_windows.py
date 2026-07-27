@@ -206,54 +206,15 @@ class PoolingWindows(nn.Module):
 
     Notes
     -----
-    The windows used by this object are created using
-    ``pooling.pooling.create_pooling_windows``, which can also be used in conjunction
-    with ``pooling.pooling.normalize_windows`` to reproduce the windows.
-    Although we have hard-coded the standard deviation (to 1, for
-    ``window_type="gaussian"``) and transition region width (to 0.5, for
-    ``window_type="cosine"``) when creating the ``PoolingWindows`` object, it is
-    possible to manually adjust these parameters when using ``create_pooling_windows``.
-    However, only the default values have been tested! It is unclear whether the
-    windows will uniformly tile the images otherwise.
+    If you are just interested in the eccentricity and angular filters
+    associated with these pooling windows, this is also possible using
+    a combination of ``pooling.pooling.create_pooling_windows`` and
+    ``pooling.pooling.normalize_windows``. See Examples section of
+    ``create_pooling_windows`` for details on this process.
 
-    To create gaussian windows:
-
-    >>> import matplotlib.pyplot as plt
-    >>> import pooling
-    >>> angle_w, ecc_w = pooling.pooling.create_pooling_windows(
-            scaling=0.8,
-            img_res=(256, 256),
-            min_eccentricity=1,
-            max_eccentricity=10,
-            radial_to_circumferential_ratio=2,
-            window_type="gaussian",
-            transition_region_width=None,
-            std_dev=1,
-            device="cpu"
-        )
-
-    To create raised cosine windows:
-
-    >>> angle_w, ecc_w = pooling.pooling.create_pooling_windows(
-            scaling=0.8,
-            img_res=(256, 256),
-            min_eccentricity=1,
-            max_eccentricity=10,
-            radial_to_circumferential_ratio=2,
-            window_type="cosine",
-            transition_region_width=0.5,
-            std_dev=None,
-            device="cpu"
-        )
-
-    To normalize resulting windows:
-
-    >>> ecc_windows, scale_factor = pooling.pooling.normalize_windows(
-            angle_windows=angle_w,
-            ecc_windows=ecc_w,
-            window_eccentricity=1,
-            scale=0
-        )
+    See Also
+    --------
+    pooling.pooling.create_pooling_windows : create angle and eccentricity windows
 
     References
     ----------
@@ -401,9 +362,10 @@ class PoolingWindows(nn.Module):
             # otherwise, use the central one.
             except AttributeError:
                 ecc = self.central_eccentricity_degrees
-            self.ecc_windows, norm_factor = pooling.normalize_windows(
-                self.angle_windows, self.ecc_windows, ecc, i
+            norm_ecc, norm_factor = pooling.normalize_windows(
+                angle_windows, ecc_windows, ecc
             )
+            self.ecc_windows[i] = norm_ecc
             self.norm_factor[i] = norm_factor
 
     def _window_sizes(self):
