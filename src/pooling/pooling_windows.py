@@ -1404,6 +1404,7 @@ class PoolingWindows(nn.Module):
         In order to display the window size parameters nicely, ``pprint``
         is recommended:
 
+        >>> import pooling
         >>> from pprint import pprint
         >>> pw = pooling.PoolingWindows(0.5, (256, 256))
         >>> summary = pw.summarize_window_sizes()
