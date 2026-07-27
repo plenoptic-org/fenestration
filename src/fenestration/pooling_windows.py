@@ -160,7 +160,7 @@ class PoolingWindows(nn.Module):
         If str, this is the directory where we cached / looked for
         cached windows tensors. This directory must already exist, or we raise
         a FileNotFoundError.
-    cached_paths : list
+    cache_paths : list
         List of strings, one per scale, taht we either saved or loaded
         the cached windows tensors from
     num_scales : int
@@ -845,7 +845,8 @@ class PoolingWindows(nn.Module):
 
         This function saves all necessary data for model initialization at the
         specified path. It does not save the window tensors themselves; these
-        are saved during object initialization if the ``cache_dir`` argument was set.
+        are saved during object initialization if the ``cache_dir`` argument was
+        set.
 
         Parameters
         ----------
@@ -859,13 +860,13 @@ class PoolingWindows(nn.Module):
 
         Examples
         --------
-        To use, just input a file path in order to save the parameters needed for
-        initializing the pooling window model.
+        To use, just input a file path in order to save the parameters needed
+        for initializing the pooling window model.
 
         >>> import fenestration as fen
         >>> pw = fen.PoolingWindows(0.5, (256, 256))
-        >>> pw.save("./model_params.pt")
-        >>> pw_new = fen.PoolingWindows.load("./model_params.pt")
+        >>> pw.save("model_params.pt")
+        >>> pw_new = fen.PoolingWindows.load("model_params.pt")
 
         """
         save_dict = {
@@ -1371,6 +1372,7 @@ class PoolingWindows(nn.Module):
         In order to display the window size parameters nicely, ``pprint``
         is recommended:
 
+        >>> import pooling
         >>> from pprint import pprint
         >>> import fenestration as fen
         >>> pw = fen.PoolingWindows(0.5, (256, 256))
