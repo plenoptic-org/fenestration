@@ -416,8 +416,8 @@ def _log_eccentricity_windows(
 def create_pooling_windows(
     scaling: float | None,
     img_res: tuple[int, int],
-    min_eccentricity: float = 0.5,
-    max_eccentricity: float = 15,
+    min_ecc: float = 0.5,
+    max_ecc: float = 15,
     radial_to_circumferential_ratio: float = 2,
     window_type: Literal["cosine", "gaussian"] = "gaussian",
     transition_region_width: float | None = None,
@@ -445,11 +445,11 @@ def create_pooling_windows(
     img_res
         2-tuple of ints specifying the resolution of the 2d images to
         make.
-    min_eccentricity
+    min_ecc
         The minimum eccentricity, the eccentricity below which we do not
         compute pooling windows (in degrees). Parameter :math:`e_0` in
         equation 11 of the online methods.
-    max_eccentricity
+    max_ecc
         The maximum eccentricity, the outer radius of the image (in
         degrees). Parameter :math:`e_r` in equation 11 of the online
         methods.
@@ -510,8 +510,8 @@ def create_pooling_windows(
     >>> angle_w, ecc_w = fen.create_pooling_windows(
     ...     scaling=0.8,
     ...     img_res=(256, 256),
-    ...     min_eccentricity=1,
-    ...     max_eccentricity=10,
+    ...     min_ecc=1,
+    ...     max_ecc=10,
     ...     radial_to_circumferential_ratio=2,
     ...     window_type="gaussian",
     ...     transition_region_width=None,
@@ -524,8 +524,8 @@ def create_pooling_windows(
     >>> angle_w, ecc_w = fen.create_pooling_windows(
     ...     scaling=0.8,
     ...     img_res=(256, 256),
-    ...     min_eccentricity=1,
-    ...     max_eccentricity=10,
+    ...     min_ecc=1,
+    ...     max_ecc=10,
     ...     radial_to_circumferential_ratio=2,
     ...     window_type="cosine",
     ...     transition_region_width=0.5,
@@ -600,7 +600,7 @@ def create_pooling_windows(
 
     """
     ecc_window_spacing = calculate._eccentricity_window_spacing(
-        min_eccentricity, max_eccentricity, scaling=scaling, std_dev=std_dev
+        min_ecc, max_ecc, scaling=scaling, std_dev=std_dev
     )
     n_polar_windows = calculate._angular_n_windows(
         ecc_window_spacing / radial_to_circumferential_ratio
@@ -621,8 +621,8 @@ def create_pooling_windows(
         img_res,
         None,
         ecc_window_spacing,
-        min_eccentricity,
-        max_eccentricity,
+        min_ecc,
+        max_ecc,
         window_type,
         std_dev=std_dev,
         transition_region_width=transition_region_width,

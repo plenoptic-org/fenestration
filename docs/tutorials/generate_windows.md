@@ -68,14 +68,14 @@ pw = fen.PoolingWindows(0.5, (256,256))
 pw.plot_windows(subset=False)
 ```
 
-We can also change a number of other parameters that define the windows: `min_eccentricity` and `max_eccentricity` that define the extent of the windows within the image in degrees of visual angle, `num_scales` which controls the number of window scales generated, `cache_dir` for specifying a directory to cache the windows, and `window_type` which can be defined as `gaussian` or `cosine`.
+We can also change a number of other parameters that define the windows: `min_ecc` and `max_ecc` that define the extent of the windows within the image in degrees of visual angle, `num_scales` which controls the number of window scales generated, `cache_dir` for specifying a directory to cache the windows, and `window_type` which can be defined as `gaussian` or `cosine`.
 
 ```{code-cell} ipython3
 pw = fen.PoolingWindows(
   scaling=0.5,
   img_res=(256,256),
-  min_eccentricity=1,
-  max_eccentricity=10,
+  min_ecc=1,
+  max_ecc=10,
   window_type='cosine'
   )
 pw.plot_windows()
@@ -152,7 +152,7 @@ However, the `scaling` values used in previous examples were arbitrary. Let's sa
 
 ```{code-cell} ipython3
 scaling = fen.calculate.scaling(n_windows=5, min_ecc=1, max_ecc=10, std_dev=1)
-pw = fen.PoolingWindows(scaling, (256,256), min_eccentricity=1, max_eccentricity=10)
+pw = fen.PoolingWindows(scaling, (256,256), min_ecc=1, max_ecc=10)
 ax = pw.plot_windows()
 ax.set_title(f"Scaling = {scaling:.4f}");
 ```
