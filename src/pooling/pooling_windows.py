@@ -1394,10 +1394,17 @@ class PoolingWindows(nn.Module):
         In order to display the window size parameters nicely, ``pprint``
         is recommended:
 
+        >>> import pooling
         >>> from pprint import pprint
         >>> pw = pooling.PoolingWindows(0.5, (256, 256))
         >>> summary = pw.summarize_window_sizes()
         >>> pprint(summary)
+        {'max_window_scale_0_area': np.float64(1489.7697961809874),
+        'max_window_scale_0_center': np.float64(123.18551268877933),
+        'max_window_scale_0_fwhm': np.float64(61.59275634438966),
+        'min_window_scale_0_area': np.float64(2.721047914586897),
+        'min_window_scale_0_center': np.float64(5.26463355455719),
+        'min_window_scale_0_fwhm': np.float64(2.632316777278595)}
 
         """
         min_idx = np.abs(
