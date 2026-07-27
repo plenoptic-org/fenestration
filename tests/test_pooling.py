@@ -227,12 +227,21 @@ class TestPooling:
         pw.save(tmp_path / "model.pt")
         new_path = tmp_path / "newdir"
         new_path.mkdir()
-        pw_load = fen.PoolingWindows.load(
-            tmp_path / "model.pt", cache_dir=tmp_path / "newdir/"
+        # move cached file to new path. only 1 for num_scales=1, could do multiple
+        pathlib.Path(pw.cache_paths[0]).rename(
+            new_path / pathlib.Path(pw.cache_paths[0]).name
         )
-        assert pathlib.Path(pw_load.cache_dir) == pathlib.Path(
-            str(tmp_path) + "/newdir/"
-        )
+        # load using new path where cached file now lives
+        pw_load = fen.PoolingWindows.load(tmp_path / "model.pt", cache_dir=new_path)
+        assert pathlib.Path(pw_load.cache_dir) == new_path
+        assert pathlib.Path(new_path / pathlib.Path(pw.cache_paths[0]).name).exists()
+        assert pathlib.Path(new_path / pathlib.Path(pw.cache_paths[0]).name).is_file()
+        assert not pathlib.Path(
+            tmp_path / pathlib.Path(pw.cache_paths[0]).name
+        ).exists()
+        assert not pathlib.Path(
+            tmp_path / pathlib.Path(pw.cache_paths[0]).name
+        ).is_file()
 
     @pytest.mark.parametrize("scaling", [0.5, 1])
     @pytest.mark.parametrize("ecc", [[0.5, 10], [1, 15]])

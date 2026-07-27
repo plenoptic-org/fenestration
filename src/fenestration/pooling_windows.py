@@ -159,7 +159,7 @@ class PoolingWindows(nn.Module):
         If str, this is the directory where we cached / looked for
         cached windows tensors. This directory must already exist, or we raise
         a FileNotFoundError.
-    cached_paths : list
+    cache_paths : list
         List of strings, one per scale, taht we either saved or loaded
         the cached windows tensors from
     num_scales : int
@@ -858,8 +858,8 @@ class PoolingWindows(nn.Module):
 
         >>> import fenestration as fen
         >>> pw = fen.PoolingWindows(0.5, (256, 256))
-        >>> pw.save("./model_params.pt")
-        >>> pw_new = fen.PoolingWindows.load("./model_params.pt")
+        >>> pw.save("model_params.pt")
+        >>> pw_new = fen.PoolingWindows.load("model_params.pt")
 
         """
         save_dict = {
@@ -911,8 +911,8 @@ class PoolingWindows(nn.Module):
 
         >>> import fenestration as fen
         >>> pw = fen.PoolingWindows(0.5, (256, 256))
-        >>> pw.save("./model_params.pt")
-        >>> pw_new = fen.PoolingWindows.load("./model_params.pt")
+        >>> pw.save("model_params.pt")
+        >>> pw_new = fen.PoolingWindows.load("model_params.pt")
         >>> pw_new
         PoolingWindows()
 
