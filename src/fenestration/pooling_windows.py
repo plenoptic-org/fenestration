@@ -922,8 +922,8 @@ class PoolingWindows(nn.Module):
 
         >>> import fenestration as fen
         >>> pw = fen.PoolingWindows(0.5, (256, 256))
-        >>> pw.save("./model_params.pt")
-        >>> pw_new = fen.PoolingWindows.load("./model_params.pt")
+        >>> pw.save("model_params.pt")
+        >>> pw_new = fen.PoolingWindows.load("model_params.pt")
         >>> pw_new
         PoolingWindows()
 
