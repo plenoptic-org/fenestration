@@ -131,3 +131,6 @@ dmypy.json
 # docs
 docs/_build
 docs/api/generated
+
+# saved files
+*.pt
