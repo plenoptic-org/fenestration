@@ -51,21 +51,21 @@ class PoolingWindows(nn.Module):
     happen each iteration of the metamer synthesis, pre-generating
     appropriately sized windows is more efficient).
 
-    We will calculate the minimum eccentricity at which the area of the
+    We will calculate the minimal eccentricity at which the area of the
     windows at half-max exceeds one pixel at each scale. For scales
     beyond the first however, we will not throw an Exception if this
-    value is below ``min_ecc``. We instead print a warning to
-    alert the user and use this value as ``min_ecc`` when
+    value is below :attr:`min_ecc`. We instead print a warning to
+    alert the user and use this value as :attr:`min_ecc` when
     creating the plots. In order to see what this value was, see
-    ``self.calculated_min_eccentricity_degrees``.
+    :attr:`calculated_min_eccentricity_pixels`.
 
     We can optionally cache the windows tensor we create, if
-    ``cache_dir`` is not ``None``. In that case, we'll also check to see if
+    :attr:`cache_dir` is not ``None``. In that case, we'll also check to see if
     appropriate cached windows exist before creating them and load them
     if they do. The path we'll use is
     ``{cache_dir}/scaling-{scaling}_size-{img_res}_e0-{min_ecc}_
     em-{max_ecc}_{window_type}.pt``. We'll cache each scale separately,
-    changing the ``img_res`` (and potentially ``min_ecc``) values in that save
+    changing the :attr:`img_res` (and potentially :attr:`min_ecc`) values in that save
     path appropriately.
 
     Parameters
@@ -76,7 +76,7 @@ class PoolingWindows(nn.Module):
     img_res
         The resolution of our image (should therefore contains
         integers). Will use this to generate appropriately sized pooling
-        windows where ``max_ecc`` is set to the outer radius of the image.
+        windows where :attr:`max_ecc` is set to the outer radius of the image.
     min_ecc
         The eccentricity at which the pooling windows start.
     max_ecc
@@ -115,14 +115,14 @@ class PoolingWindows(nn.Module):
         different size.
     norm_factor : dict
         A dict of 3d tensors containing the values used to normalize
-        ``ecc_windows``. Each key corresponds to a different scale. This is
+        :attr:`ecc_windows`. Each key corresponds to a different scale. This is
         stored to undo that normalization for plotting and projection.
     window_width_pixels : list
         List of dictionaries containing the widths of the windows in
         pixels; each entry in the list corresponds to the widths for a
         different scale, as in ``windows``. See above for explanation of
         the dictionaries. To visualize these, see the
-        ``plot_window_widths`` method.
+        :meth:`plot_window_widths` method.
     n_polar_windows : int
         The number of windows we have in the polar angle dimension
         (within each eccentricity band)
@@ -150,7 +150,7 @@ class PoolingWindows(nn.Module):
         approximate area, we multiply the radial and angular widths against each
         other and then by pi/4 to get the area of the regular ellipse that has
         those widths (our windows are elongated, so this is probably an
-        under-estimate). To visualize these, see the ``plot_window_areas`` method.
+        under-estimate). To visualize these, see the :meth:`plot_window_areas` method.
     deg_to_pix : list
         List of floats containing the degree-to-pixel conversion factor
         at each scale
@@ -180,20 +180,20 @@ class PoolingWindows(nn.Module):
 
     See Also
     --------
-    fen.create_pooling_windows : create angle and eccentricity windows
+    create_pooling_windows : create angle and eccentricity windows
 
     Notes
     -----
     We will calculate the minimum eccentricity at which the
     area of the windows at half-max exceeds one pixel (based on
-    ``scaling``, ``img_res`` and ``max_ecc``) and, if
-    ``min_ecc`` is below that, will throw an Exception.
+    :attr:`scaling`, :attr:`img_res` and :attr:`max_ecc`) and, if
+    :attr:`min_ecc` is below that, will throw an Exception.
 
     If you are just interested in the eccentricity and angular filters
     associated with these pooling windows, this is also possible using
-    a combination of ``fen.create_pooling_windows`` and
-    ``fen.pooling.normalize_windows``. See Examples section of
-    ``create_pooling_windows`` for details on this process.
+    a combination of :mod:`~fenestration.create_pooling_windows` and
+    :mod:`~fenestration.pooling.normalize_windows`. See Examples section of
+    :mod:`~fenestration.create_pooling_windows` for details on this process.
 
     References
     ----------
@@ -501,8 +501,8 @@ class PoolingWindows(nn.Module):
         This combines the angle_windows, ecc_windows, and window_size
         dictionaries of two PoolingWindows objects. Since they will both
         have similarly-indexed keys (0, 1, 2,... based on
-        ``self.num_scales``), we need some offset to keep them separate,
-        which ``scale_offset`` provides. We thus merge the dictionaries like
+        :attr:`num_scales`), we need some offset to keep them separate,
+        which :attr:`scale_offset` provides. We thus merge the dictionaries like
         so:
 
         .. code-block:: python
@@ -510,13 +510,13 @@ class PoolingWindows(nn.Module):
             for k, v in other_PoolingWindows.angle_windows.items():
                 self.angle_windows[k + scale_offset] = v
 
-        and similarly for ``ecc_windows`` and ``window_size``.
+        and similarly for :attr:`ecc_windows` and :attr:`norm_factor`.
 
         The intended use case for this is to create one PoolingWindows
         object for a steerable pyramid with some number of scales, and
         then a second one for a corresponding "half-octave" steerable
         pyramid, which is built on the original image down-sampled by a
-        factor of :math:``\sqrt{2}`` in order to sample the frequencies half-way
+        factor of :math:`\sqrt{2}` in order to sample the frequencies half-way
         between the scales of the original pyramid. You might want to
         slightly adjust the shape of the down-sampled image (e.g., to
         make its size even), so we don't provide support to
@@ -529,7 +529,7 @@ class PoolingWindows(nn.Module):
 
         Parameters
         ----------
-        other_PoolingWindows : fen.PoolingWindows
+        other_PoolingWindows : fenestration.PoolingWindows
             A second instantiated PoolingWindows object
         scale_offset : float, optional
             The amount to offset all the keys of the second
@@ -555,7 +555,7 @@ class PoolingWindows(nn.Module):
         the same keys and have changed all the values to 5d tensors,
         with windows indexed along the 3rd dimension.
 
-        If it's a 4d tensor, we use the ``idx`` entry in the ``windows``
+        If it's a 4d tensor, we use the :attr:`idx` entry in the ``windows``
         list. If it's a dictionary, we assume it's keys are ``(scale,
         orientation)`` tuples and so use ``windows[key[0]]`` to find the
         appropriately-sized window (this is the case for, e.g., the
@@ -572,7 +572,7 @@ class PoolingWindows(nn.Module):
             Either a 4d tensor or a dictionary of 4d tensors.
         idx
             Which entry in the ``windows`` list to use. Only used if
-            ``x`` is a tensor
+            :attr:`x` is a tensor
         weights
             If not None, should be a tensor of shape (scales, batch, channel,
             eccentricity, angle), this allows us to reweight the pooled input
@@ -581,7 +581,7 @@ class PoolingWindows(nn.Module):
         Returns
         -------
         pooled_x
-            Same type as ``x``, see above for how it's created.
+            Same type as :attr:`x`, see above for how it's created.
 
         See Also
         --------
@@ -632,7 +632,7 @@ class PoolingWindows(nn.Module):
         the same keys and have changed all the values to 5d tensors,
         with windows indexed along the 3rd dimension.
 
-        If it's a 4d tensor, we use the ``idx`` entry in the ``windows``
+        If it's a 4d tensor, we use the :attr:`idx` entry in the ``windows``
         list. If it's a dictionary, we assume it's keys are ``(scale,
         orientation)`` tuples and so use ``windows[key[0]]`` to find the
         appropriately-sized window (this is the case for, e.g., the
@@ -645,12 +645,12 @@ class PoolingWindows(nn.Module):
             Either a 4d tensor or a dictionary of 4d tensors
         idx
             Which entry in the ``windows`` list to use. Only used if
-            ``x`` is a tensor
+            :attr:`x` is a tensor
 
         Returns
         -------
         windowed_x
-            Same type as ``x``, see above for how it's created
+            Same type as :attr:`x`, see above for how it's created
 
         Raises
         ------
@@ -704,7 +704,7 @@ class PoolingWindows(nn.Module):
     ) -> dict[torch.Tensor] | torch.Tensor:
         r"""Pool the windowed input.
 
-        We take the windowed input (as returned by ``self.window()``)
+        We take the windowed input (as returned by :meth:`window`)
         and perform a weighted average, dividing each windowed statistic
         by the sum of the window that generated it.
 
@@ -712,8 +712,8 @@ class PoolingWindows(nn.Module):
         tensors and we collapse across the spatial dimensions, returning
         a 3d tensor or a dictionary of 3d tensors.
 
-        Similar to ``self.window()``, if it's a tensor, we use the
-        ``idx`` entry in the ``windows`` list. If it's a dictionary, we
+        Similar to :meth:`window`, if it's a tensor, we use the
+        :attr:`idx` entry in the ``windows`` list. If it's a dictionary, we
         assume it's keys are ``(scale, orientation)`` tuples and so use
         ``windows[key[0]]`` to find the appropriately-sized window (this
         is the case for, e.g., the steerable pyramid). If we want to use
@@ -726,12 +726,12 @@ class PoolingWindows(nn.Module):
             Either a 5d tensor or a dictionary of 5d tensors
         idx
             Which entry in the ``windows`` list to use. Only used if
-            ``windowed_x`` is a tensor
+            :attr:`windowed_x` is a tensor
 
         Returns
         -------
         pooled_x
-            Same type as ``windowed_x``, see above for how it's created.
+            Same type as :attr:`windowed_x`, see above for how it's created.
 
         See Also
         --------
@@ -758,10 +758,10 @@ class PoolingWindows(nn.Module):
         you.
 
         It takes a 3d tensor or dictionary of 3d tensors (like the
-        output of ``forward()`` / ``pool()``; the final dimension must
+        output of :meth:`forward` / :meth:`pool`; the final dimension must
         have a value for each window) and returns a 4d tensor or
-        dictionary of 4d tensors (like the input of ``forward()`` /
-        ``window()``).
+        dictionary of 4d tensors (like the input of :meth:`forward` /
+        :meth:`window`).
 
         For example, if we have 100 windows, you must pass a i x j x 100
         tensor. For each of the i batches and j channels, we'll then
@@ -775,7 +775,7 @@ class PoolingWindows(nn.Module):
             3d Tensor or a dictionary of 3d tensors
         idx
             Which entry in the ``windows`` list to use. Only used if
-            ``pooled_x`` is a tensor.
+            :attr:`pooled_x` is a tensor.
 
         Returns
         -------
@@ -846,7 +846,7 @@ class PoolingWindows(nn.Module):
 
         This function saves all necessary data for model initialization at the
         specified path. It does not save the window tensors themselves; these
-        are saved during object initialization if the ``cache_dir`` argument was
+        are saved during object initialization if the :attr:`cache_dir` argument was
         set.
 
         Parameters
@@ -900,7 +900,7 @@ class PoolingWindows(nn.Module):
             overriding the saved value. This allows you to e.g., load from a cache
             at a different location.
         kwargs
-            Any additional kwargs to pass to ``torch.load``
+            Any additional kwargs to pass to :meth:`torch.load`
 
         Returns
         -------
@@ -914,8 +914,8 @@ class PoolingWindows(nn.Module):
 
         Examples
         --------
-        To use, just input a path to the file saved using ``save`` in order to load the
-        parameters needed for initializing the pooling window model.
+        To use, just input a path to the file saved using :meth:`save` in order to load
+        the parameters needed for initializing the pooling window model.
 
         >>> import fenestration as fen
         >>> pw = fen.PoolingWindows(0.5, (256, 256))
@@ -949,7 +949,7 @@ class PoolingWindows(nn.Module):
         on an axis. The intended use case is overlaying this on top of
         the image we're pooling.
 
-        Any additional kwargs get passed to ``ax.contour``.
+        Any additional kwargs get passed to :meth:`ax.contour`.
 
         Parameters
         ----------
@@ -957,7 +957,7 @@ class PoolingWindows(nn.Module):
             The axis to plot the windows on. If None, will create a new
             figure with 1 axis.
         contour_levels
-            The ``levels`` argument to pass to ``ax.contour``. From that
+            The :attr:`levels` argument to pass to :meth:`ax.contour`. From that
             documentation: "Determines the number and positions of the
             contour lines / regions. If an int ``n``, use ``n`` data
             intervals; i.e. draw ``n+1`` contour lines. The level
@@ -1025,11 +1025,11 @@ class PoolingWindows(nn.Module):
 
         This plots the average values of an image, as computed by these
         windows, and plots them using contourf as an RGB triple. We plot these
-        within the window contours using ``self.window_intersecting_amplitude``, so
-        that if you call ``self.plot_windows`` with ``contour_levels=None``, they will
+        within the window contours using :attr:`window_intersecting_amplitude`, so
+        that if you call :meth:`plot_windows` with ``contour_levels=None``, they will
         outline these regions.
 
-        Any additional kwargs are passed to ``ax.contourf``.
+        Any additional kwargs are passed to :meth:`ax.contourf`.
 
         Parameters
         ----------
@@ -1055,7 +1055,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         Exception
-            If ``im`` has more than one batch or channel
+            If :attr:`im` has more than one batch or channel
 
         """
         if ax is None:
@@ -1128,7 +1128,7 @@ class PoolingWindows(nn.Module):
         windows at their central eccentricity
 
         If the unit is 'pixels', then we also need to know which
-        ``scale_num`` to plot (the windows are created at different
+        :attr:`scale_num` to plot (the windows are created at different
         scales, and so come in different pixel sizes)
 
         Parameters
@@ -1159,7 +1159,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         Exception
-            If ``units`` are not 'pixels' or 'degrees'
+            If :attr:`units` are not 'pixels' or 'degrees'
 
         """
         if units == "degrees":
@@ -1211,8 +1211,8 @@ class PoolingWindows(nn.Module):
         full is the width of the entire window; half is the width at the
         half-max value, which is what corresponds to the scaling
         value). To get the approximate area, we multiply the radial
-        width against the corresponding angular width, then divide by pi
-        / 4.
+        width against the corresponding angular width, then divide by
+        :math:`\frac{\pi}{4}`.
 
         The half area shown here is what we use to compare against a
         threshold value to determine the minimal eccentricity at which
@@ -1222,7 +1222,7 @@ class PoolingWindows(nn.Module):
         windows at their central eccentricity.
 
         If the unit is 'pixels', then we also need to know which
-        ``scale_num`` to plot (the windows are created at different
+        :attr:`scale_num` to plot (the windows are created at different
         scales, and so come in different pixel sizes).
 
         Parameters
@@ -1247,7 +1247,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         Exception
-            If ``units`` are not 'pixels' or 'degrees'
+            If :attr:`units` are not 'pixels' or 'degrees'
 
         """
         if units == "degrees":
@@ -1344,10 +1344,10 @@ class PoolingWindows(nn.Module):
         r"""Summarize window sizes.
 
         This function returns a dictionary summarizing the window sizes
-        at the minimum and maximum eccentricity. Let ``min_window`` be
-        the window whose center is closest to ``self.min_ecc``
+        at the minimum and maximum eccentricity. Let `min_window`` be
+        the window whose center is closest to :attr:`min_ecc`
         and ``max_window`` the one whose center is closest to
-        ``self.max_ecc``. If ``units="degrees"``, we find its
+        :attr:`max_ecc`. If ``units="degrees"``, we find its
         center, FWHM (in the radial direction), and approximate area (at
         half-max). If ``units="pixels"``, we do the same for each scale.
 
@@ -1365,7 +1365,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         Exception
-            If ``units`` are not "pixels" or "degrees"
+            If :attr:`units` are not "pixels" or "degrees"
 
         Examples
         --------
