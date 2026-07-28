@@ -42,7 +42,7 @@ version_scheme = 'semver-pep440'
 local_scheme = 'no-local-version'
 
 [tool.pytest.ini_options]
-addopts = "--cov=pooling --cov-report term"
+addopts = "--cov=fenestration --cov-report term"
 testpaths = ["tests"]
 doctest_optionflags = "NORMALIZE_WHITESPACE NUMBER ELLIPSIS"
 
