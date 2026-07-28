@@ -57,9 +57,9 @@ GAUSSIAN_SUM = 2 * 1.753314144021452772415339526931980189073725635759454989253 -
 def gaussian(x: float | np.ndarray, std_dev: float | None = 1) -> np.ndarray:
     r"""Compute simple gaussian with mean 0, and adjustable std dev.
 
-    Possible alternative window function, giving the weighting in each
+    Possible window function, giving the weighting in each
     direction for the spatial pooling performed during the construction
-    of visual metamers
+    of visual metamers.
 
     Parameters
     ----------
@@ -89,16 +89,16 @@ def gaussian(x: float | np.ndarray, std_dev: float | None = 1) -> np.ndarray:
     Summing at this location will give us the value we need to normalize
     by, :math:`S`. We work through this with :math:`\sigma=1`:
 
-    ..math::
+    .. math::
 
-        S &= 1 + 2 * \exp(\frac{-(1)^2}{2\sigma^2}) +
-        2 * \exp(\frac{-(2)^2}{2\sigma^2}) + ...
-        S &= 1 + 2 * \sum_{n=1}^{\inf} \exp({-n^2}{2})
-        S &= -1 + 2 * \sum_{n=0}^{\inf} \exp({-n^2}{2})
+        S &= 1 + 2 * \exp(\frac{-(1)^2}{2\sigma^2}) + 2 * \exp(\frac{-(2)^2}{2\sigma^2})
+         + ... \\
+        S &= 1 + 2 * \sum_{n=1}^{\inf} \exp(\frac{-n^2}{2}) \\
+        S &= -1 + 2 * \sum_{n=0}^{\inf} \exp(\frac{-n^2}{2})
 
     And we've stored this number as the constant ``GAUSSIAN_SUM`` (the
-    infinite sum computed in the equation above was using Wolfram Alpha,
-    https://www.wolframalpha.com/input/?i=sum+0+to+inf+e%5E%28-n%5E2%2F2%29+)
+    infinite sum computed in the equation above was using
+    `Wolfram Alpha <https://www.wolframalpha.com/input/?i=sum+0+to+inf+e%5E%28-n%5E2%2F2%29+>`_.
 
     When ``std_dev>1``, the windows overlap more. As with the
     probability density function of a normal distribution, we divide by
@@ -115,8 +115,9 @@ def raised_cosine(
 ) -> np.ndarray:
     r"""Compute raised cosine window function.
 
-    Used to give the weighting in each direction for the spatial pooling
-    performed during the construction of visual metamers
+    Possible window function, giving the weighting in each
+    direction for the spatial pooling performed during the construction
+    of visual metamers.
 
     Notes
     -----
@@ -441,7 +442,7 @@ def create_pooling_windows(
     ----------
     scaling
         The ratio of the eccentricity window's radial full-width at
-        half-maximum to eccentricity (see the `calculate.scaling` function).
+        half-maximum to eccentricity (see the ``calculate.scaling`` function).
     img_res
         2-tuple of ints specifying the resolution of the 2d images to
         make.
@@ -456,7 +457,7 @@ def create_pooling_windows(
     radial_to_circumferential_ratio
         ``scaling`` determines the number of log-eccentricity windows we
         can create; this ratio gives us the number of polar angle
-        ones. Based on `scaling`, we calculate the width of the windows
+        ones. Based on ``scaling``, we calculate the width of the windows
         in log-eccentricity, and then divide that by this number to get
         their width in polar angle. Because we require an integer number
         of polar angle windows, we round the resulting number of polar
@@ -566,13 +567,7 @@ def create_pooling_windows(
 
         >>> import fenestration as fen
         >>> import torch
-        >>> angle_w, ecc_w = fen.create_pooling_windows(
-        ...     0.8,
-        ...     (256, 256),
-        ...     window_type="cosine",
-        ...     transition_region_width=0.5,
-        ...     std_dev=None,
-        ... )
+        >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
         >>> # we ignore the last ring of eccentricity windows here because
         >>> # they're all relatively small, which makes the following plot
         >>> # look weird. for how to properly handle them, see the

@@ -292,7 +292,7 @@ def scaling(
 
     .. math::
 
-        e_c &= e_0 \cdot \exp(w_e(n+1))
+        e_c = e_0 \cdot \exp(w_e(n+1))
 
     Then the scaling, :math:`s` is the ratio :math:`\frac{W}{e_c}`:
 

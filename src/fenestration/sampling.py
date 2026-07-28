@@ -33,7 +33,7 @@ def check_sampling(
     val_sampling: float | None = 0.5,
     pix_sampling: int | None = None,
     func: Callable[[float | np.ndarray], np.ndarray] = gaussian,
-    x: torch.Tensor | np.ndarray = torch.linspace(-5, 5, 101),
+    x: torch.Tensor | np.ndarray | None = None,
     **func_kwargs: Any,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     r"""Check how sampling relates to interpolation quality.
@@ -172,7 +172,7 @@ def interpolation_plot(
     residuals: np.ndarray,
     pix: int | None = 0,
     val: float | None = None,
-    x: torch.Tensor | np.ndarray = np.linspace(-5, 5, 101),
+    x: torch.Tensor | np.ndarray | None = None,
     full: np.ndarray | None = None,
 ) -> Figure:
     r"""Create plot showing interpolation results at specified pixel or value.
@@ -237,7 +237,7 @@ def interpolation_plot(
 def create_movie(
     interpolated: np.ndarray,
     residuals: np.ndarray,
-    x: torch.Tensor | np.ndarray = np.linspace(-5, 5, 101),
+    x: torch.Tensor | np.ndarray | None = None,
     full: np.ndarray | None = None,
     framerate: int = 10,
 ) -> animation.FuncAnimation:

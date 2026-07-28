@@ -1215,8 +1215,8 @@ class PoolingWindows(nn.Module):
         / 4.
 
         The half area shown here is what we use to compare against a
-        threshold value in order to determine the minimal eccentricity
-        in order for windows to contain more than 1 pixel.
+        threshold value to determine the minimal eccentricity at which
+        windows contain more than 1 pixel.
 
         We plot this as a stem plot against eccentricity, showing the
         windows at their central eccentricity.
