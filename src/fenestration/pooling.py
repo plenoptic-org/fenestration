@@ -547,7 +547,6 @@ def create_pooling_windows(
 
        >>> import fenestration as fen
        >>> import matplotlib.pyplot as plt
-       >>> import pooling
        >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
        >>> fig, ax = plt.subplots(1, 2, figsize=(8, 4))
        >>> ax[0].imshow(ecc_w[0], cmap="Grays_r", interpolation="none")
