@@ -85,6 +85,6 @@ class TestSampling:
 
     @pytest.mark.parametrize("check_idx", [1, 50, 100])
     def test_check_interp_order(self, x_eval, check_idx):
-        _, _, interps, _, _ = pooling.sampling.check_sampling(0.5, x=x_eval)
+        _, _, interps, _, _ = fen.sampling.check_sampling(0.5, x=x_eval)
         max_idx = np.argmax(interps[check_idx])
         assert check_idx == max_idx
