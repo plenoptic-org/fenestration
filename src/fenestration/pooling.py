@@ -560,14 +560,14 @@ def create_pooling_windows(
         :include-source:
         :context: close-figs
 
-       >>> import fenestration as fen
-       >>> import matplotlib.pyplot as plt
-       >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
-       >>> fig, ax = plt.subplots(1, 2, figsize=(8, 4))
-       >>> ax[0].imshow(ecc_w[0], cmap="Grays_r", interpolation="none")
-       <matplotlib.image.AxesImage ...>
-       >>> ax[1].imshow(angle_w[0], cmap="Grays_r", interpolation="none")
-       <matplotlib.image.AxesImage ...>
+        >>> import fenestration as fen
+        >>> import matplotlib.pyplot as plt
+        >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
+        >>> fig, ax = plt.subplots(1, 2, figsize=(8, 4))
+        >>> ax[0].imshow(ecc_w[0], cmap="Grays_r", interpolation="none")
+        <matplotlib.image.AxesImage ...>
+        >>> ax[1].imshow(angle_w[0], cmap="Grays_r", interpolation="none")
+        <matplotlib.image.AxesImage ...>
 
     If you wish to get the windows as shown in Supplementary Figure 1C
     in the paper [6]_, use :func:`torch.einsum` (if you wish to apply these
