@@ -119,12 +119,6 @@ def raised_cosine(
     direction for the spatial pooling performed during the construction
     of visual metamers.
 
-    Notes
-    -----
-    For ``x`` values outside the function's domain, we return 0
-
-    Equation 9 from the online methods of [3]_.
-
     Parameters
     ----------
     x
@@ -142,6 +136,12 @@ def raised_cosine(
     ------
     Exception
         If ``transition_region_width`` is not between 0 and 1
+
+    Notes
+    -----
+    For ``x`` values outside the function's domain, we return 0
+
+    Equation 9 from the online methods of [3]_.
 
     References
     ----------
@@ -203,10 +203,6 @@ def _polar_angle_windows(
 
     We require an integer number of windows placed between 0 and 2 pi.
 
-    Notes
-    -----
-    Equation 10 from the online methods of [4]_.
-
     Parameters
     ----------
     n_windows
@@ -242,6 +238,10 @@ def _polar_angle_windows(
         If ``n_windows`` is not an integer
     Exception
         If ``n_windows`` is not greater than 8*``std_dev``
+
+    Notes
+    -----
+    Equation 10 from the online methods of [4]_.
 
     References
     ----------
@@ -492,6 +492,19 @@ def create_pooling_windows(
         is inferred in this function based on the values of ``scaling``,
         ``min_ecc``, and ``max_ecc``.
 
+    See Also
+    --------
+    fen.PoolingWindows : generate PoolingWindows object
+
+    References
+    ----------
+    .. [6] Freeman, J., & Simoncelli, E. P. (2011). Metamers of the
+        ventral stream. Nature Neuroscience, 14(9),
+        1195–1201. http://dx.doi.org/10.1038/nn.2889
+    .. [7] Broderick, W. F., Rufo, G., Winawer, J. & Simoncelli, E. P.
+        (2023). Foveated metamers of the early visual system. eLife,
+        12:RP90554. http://dx.doi.org/10.7554/eLife.90554.2
+
     Examples
     --------
     To use, simply call with the desired scaling and image size (for the
@@ -578,19 +591,6 @@ def create_pooling_windows(
         >>> for w in windows:
         ...     ax.contour(w, [0.14], colors="r")
         <matplotlib.contour.QuadContourSet ...>
-
-    See Also
-    --------
-    fen.PoolingWindows : generate PoolingWindows object
-
-    References
-    ----------
-    .. [6] Freeman, J., & Simoncelli, E. P. (2011). Metamers of the
-        ventral stream. Nature Neuroscience, 14(9),
-        1195–1201. http://dx.doi.org/10.1038/nn.2889
-    .. [7] Broderick, W. F., Rufo, G., Winawer, J. & Simoncelli, E. P.
-        (2023). Foveated metamers of the early visual system. eLife,
-        12:RP90554. http://dx.doi.org/10.7554/eLife.90554.2
 
 
     """

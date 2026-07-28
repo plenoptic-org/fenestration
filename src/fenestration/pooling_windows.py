@@ -178,6 +178,10 @@ class PoolingWindows(nn.Module):
         hard-coded at ``1``, therefore it's half a standard deviation away from
         the center, approximately 0.14.
 
+    See Also
+    --------
+    fen.create_pooling_windows : create angle and eccentricity windows
+
     Notes
     -----
     We will calculate the minimum eccentricity at which the
@@ -190,10 +194,6 @@ class PoolingWindows(nn.Module):
     a combination of ``fen.create_pooling_windows`` and
     ``fen.pooling.normalize_windows``. See Examples section of
     ``create_pooling_windows`` for details on this process.
-
-    See Also
-    --------
-    fen.create_pooling_windows : create angle and eccentricity windows
 
     References
     ----------
