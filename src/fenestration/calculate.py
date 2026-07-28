@@ -202,7 +202,7 @@ def _eccentricity_n_windows(
     std_dev
         The standard deviation of the Gaussian window. Adds extra
         windows to account for the fact that Gaussian windows are
-        larger. If using cosine windows, this should be None
+        larger. If using cosine windows, this should be None.
 
     Returns
     -------
@@ -275,7 +275,7 @@ def scaling(
     :math:`x_h=\sigma\sqrt{2\log 2}`.
 
     It turns out that this holds for all permissible values of
-    ``transition_region_width`` (:math:`t` in the equations) (try
+    :attr:`transition_region_width` (:math:`t` in the equations) (try
     playing around with some plots if you don't believe me).
 
     Full-width half-maximum, :math:`W`, the difference between the two
@@ -662,11 +662,11 @@ def _window_widths_actual(
 def deg_to_pix(img_res: tuple[int, int], max_ecc: float = 15) -> float:
     r"""Calculate the degree-to-pixel conversion factor.
 
-    We assume ``img_res`` is the full resolution of the image and
-    ``max_ecc`` is the radius of the image in degrees. Thus, we
-    divide half of ``img_res`` by ``max_ecc``. However, we want
+    We assume :attr:`img_res` is the full resolution of the image and
+    :attr:`max_ecc` is the radius of the image in degrees. Thus, we
+    divide half of :attr:`img_res` by :attr:`max_ecc`. However, we want
     to be able to handle non-square images, so we assume the value you
-    want to use is the max of the two numbers in ``img_res`` (this is
+    want to use is the max of the two numbers in :attr:`img_res` (this is
     the way we construct the PoolingWindow objects; we want the windows
     to fill the full image).
 

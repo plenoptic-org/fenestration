@@ -102,8 +102,8 @@ def gaussian(x: float | np.ndarray, std_dev: float | None = 1) -> np.ndarray:
 
     When ``std_dev>1``, the windows overlap more. As with the
     probability density function of a normal distribution, we divide by
-    ``std_dev`` to keep the integral constant for different values of
-    ``std_dev`` (though the integral is not 1). This means that summing
+    :attr:`std_dev` to keep the integral constant for different values of
+    :attr:`std_dev` (though the integral is not 1). This means that summing
     across multiple windows will still give us a value of 1.
 
     """
@@ -130,16 +130,16 @@ def raised_cosine(
     Returns
     -------
     array
-        The value of the raised cosine window at each value of ``x``.
+        The value of the raised cosine window at each value of :attr:`x`.
 
     Raises
     ------
     Exception
-        If ``transition_region_width`` is not between 0 and 1
+        If :attr:`transition_region_width` is not between 0 and 1
 
     Notes
     -----
-    For ``x`` values outside the function's domain, we return 0
+    For :attr:`x` values outside the function's domain, we return 0
 
     Equation 9 from the online methods of [3]_.
 
@@ -201,7 +201,7 @@ def _polar_angle_windows(
 ) -> torch.Tensor:
     r"""Create polar angle windows.
 
-    We require an integer number of windows placed between 0 and 2 pi.
+    We require an integer number of windows placed between 0 and :math:`2 \pi`.
 
     Parameters
     ----------
@@ -214,8 +214,8 @@ def _polar_angle_windows(
     window_type
         Whether to use the raised cosine function from [4]_ or a
         Gaussian that has approximately the same structure. If cosine,
-        ``transition_region_width`` must be set; if gaussian, then
-        ``std_dev`` must be set
+        :attr:`transition_region_width` must be set; if gaussian, then
+        :attr:`std_dev` must be set
     transition_region_width
         The width of the cosine windows' transition region, parameter
         :math:`t` in equation 9 from the online methods.
@@ -235,9 +235,9 @@ def _polar_angle_windows(
     Raises
     ------
     Exception
-        If ``n_windows`` is not an integer
+        If :attr:`n_windows` is not an integer
     Exception
-        If ``n_windows`` is not greater than 8*``std_dev``
+        If :attr:`n_windows` is not greater than 8*``std_dev``
 
     Notes
     -----
@@ -434,15 +434,15 @@ def create_pooling_windows(
 
     Note that these are returned separately as log-eccentricity and
     polar angle tensors and if you want the windows used in the paper
-    [6]_, you'll need to call ``torch.einsum`` (see Examples section)
-    or, better yet, use the ``PoolingWindows`` class, which is provided
+    [6]_, you'll need to call :func:`torch.einsum` (see Examples section)
+    or, better yet, use the :class:`PoolingWindows` class, which is provided
     for this purpose.
 
     Parameters
     ----------
     scaling
         The ratio of the eccentricity window's radial full-width at
-        half-maximum to eccentricity (see the ``calculate.scaling`` function).
+        half-maximum to eccentricity (see the :meth:`calculate.scaling` function).
     img_res
         2-tuple of ints specifying the resolution of the 2d images to
         make.
@@ -455,9 +455,9 @@ def create_pooling_windows(
         degrees). Parameter :math:`e_r` in equation 11 of the online
         methods.
     radial_to_circumferential_ratio
-        ``scaling`` determines the number of log-eccentricity windows we
+        :attr:`scaling` determines the number of log-eccentricity windows we
         can create; this ratio gives us the number of polar angle
-        ones. Based on ``scaling``, we calculate the width of the windows
+        ones. Based on :attr:`scaling`, we calculate the width of the windows
         in log-eccentricity, and then divide that by this number to get
         their width in polar angle. Because we require an integer number
         of polar angle windows, we round the resulting number of polar
@@ -467,7 +467,7 @@ def create_pooling_windows(
     window_type
         Whether to use the raised cosine function from [6]_ or a Gaussian that
         has approximately the same structure. If cosine,
-        ``transition_region_width`` must be set; if gaussian, then ``std_dev``
+        :attr:`transition_region_width` must be set; if gaussian, then :attr:`std_dev`
         must be set.
     transition_region_width
         The width of the transition region, parameter :math:`t` in
@@ -484,17 +484,17 @@ def create_pooling_windows(
     angle_windows
         The 3d tensor of 2d polar angle windows. Its shape will be
         ``(n_angle_windows, *img_res)``, where the number of windows
-        is inferred in this function based on the values of ``scaling``
-        and ``radial_to_circumferential_width``.
+        is inferred in this function based on the values of :attr:`scaling`
+        and :attr:`radial_to_circumferential_width`.
     ecc_windows
         The 3d tensor of 2d log-eccentricity windows. Its shape will be
         ``(n_eccen_windows, *img_res)``, where the number of windows
-        is inferred in this function based on the values of ``scaling``,
-        ``min_ecc``, and ``max_ecc``.
+        is inferred in this function based on the values of :attr:`scaling`,
+        :attr:`min_ecc`, and :attr:`max_ecc`.
 
     See Also
     --------
-    fen.PoolingWindows : generate PoolingWindows object
+    PoolingWindows : generate PoolingWindows object
 
     References
     ----------
@@ -513,10 +513,10 @@ def create_pooling_windows(
 
     Although we have hard-coded the standard deviation (to 1, for
     ``window_type="gaussian"``) and transition region width (to 0.5, for
-    ``window_type="cosine"``) when creating the ``PoolingWindows`` object, it is
-    possible to manually adjust these parameters when using ``create_pooling_windows``.
-    However, only the default values have been tested! It is unclear whether the
-    windows will uniformly tile the images otherwise.
+    ``window_type="cosine"``) when creating the :class:`PoolingWindows` object, it is
+    possible to manually adjust these parameters when using
+    :meth:`create_pooling_windows`. However, only the default values have been tested!
+    It is unclear whether the windows will uniformly tile the images otherwise.
 
     To create gaussian windows (default), you can specify the following arguments:
 
@@ -547,7 +547,7 @@ def create_pooling_windows(
     ...     device="cpu",
     ... )
 
-    To create equivalent windows to what is generated by ``fen.PoolingWindows``,
+    To create equivalent windows to what is generated by :class:`PoolingWindows`,
     you must also normalize resulting windows so they have an L1-norm of 1. This
     is useful when generating model metamers using the windows' representation
     so that each eccentricity contributes equally, facilitating optimization.
@@ -570,8 +570,8 @@ def create_pooling_windows(
         <matplotlib.image.AxesImage ...>
 
     If you wish to get the windows as shown in Supplementary Figure 1C
-    in the paper [6]_, use ``torch.einsum`` (if you wish to apply these
-    to images, use the ``PoolingWindows`` class instead, which has many
+    in the paper [6]_, use :func:`torch.einsum` (if you wish to apply these
+    to images, use the :class:`PoolingWindows` class instead, which has many
     more features):
 
     .. plot::

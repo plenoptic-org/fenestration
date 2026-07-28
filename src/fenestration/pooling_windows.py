@@ -900,7 +900,7 @@ class PoolingWindows(nn.Module):
             overriding the saved value. This allows you to e.g., load from a cache
             at a different location.
         kwargs
-            Any additional kwargs to pass to :meth:`torch.load`
+            Any additional kwargs to pass to :func:`torch.load`
 
         Returns
         -------
@@ -949,7 +949,7 @@ class PoolingWindows(nn.Module):
         on an axis. The intended use case is overlaying this on top of
         the image we're pooling.
 
-        Any additional kwargs get passed to :meth:`ax.contour`.
+        Any additional kwargs get passed to :meth:`~matplotlib.axes.Axes.contour`.
 
         Parameters
         ----------
@@ -957,7 +957,8 @@ class PoolingWindows(nn.Module):
             The axis to plot the windows on. If None, will create a new
             figure with 1 axis.
         contour_levels
-            The :attr:`levels` argument to pass to :meth:`ax.contour`. From that
+            The :attr:`levels` argument to pass to
+            :meth:`~matplotlib.axes.Axes.contour`. From that
             documentation: "Determines the number and positions of the
             contour lines / regions. If an int ``n``, use ``n`` data
             intervals; i.e. draw ``n+1`` contour lines. The level
@@ -969,7 +970,8 @@ class PoolingWindows(nn.Module):
             deviation away from max, for gaussian windows), as this is
             the easiest to see.
         colors
-            The ``colors`` argument to pass to ``ax.contour``. If a
+            The ``colors`` argument to pass to
+            :meth:`~matplotlib.axes.Axes.contour`. If a
             single character, all will have the same color; if a
             sequence, will cycle through the colors in ascending order
             (repeating if necessary).
@@ -983,7 +985,7 @@ class PoolingWindows(nn.Module):
 
         Returns
         -------
-        ax
+        ax : :class:`~matplotlib.axes.Axes`
             The axis with the windows
 
         """
@@ -1029,7 +1031,7 @@ class PoolingWindows(nn.Module):
         that if you call :meth:`plot_windows` with ``contour_levels=None``, they will
         outline these regions.
 
-        Any additional kwargs are passed to :meth:`ax.contourf`.
+        Any additional kwargs are passed to :meth:`~matplotlib.axes.Axes.contourf`.
 
         Parameters
         ----------
@@ -1049,7 +1051,7 @@ class PoolingWindows(nn.Module):
 
         Returns
         -------
-        ax
+        ax : :class:`~matplotlib.axes.Axes`
             The axis with the windows
 
         Raises
@@ -1153,7 +1155,7 @@ class PoolingWindows(nn.Module):
 
         Returns
         -------
-        fig
+        fig : :class:`~matplotlib.figure.Figure`
             The figure containing the plot
 
         Raises
@@ -1241,7 +1243,7 @@ class PoolingWindows(nn.Module):
 
         Returns
         -------
-        fig
+        fig : :class:`~matplotlib.figure.Figure`
             The figure containing the plot
 
         Raises
@@ -1298,7 +1300,7 @@ class PoolingWindows(nn.Module):
 
         Returns
         -------
-        fig : plt.Figure
+        fig : :class:`~matplotlib.figure.Figure`
             The figure containing the plot
 
         """
@@ -1369,8 +1371,8 @@ class PoolingWindows(nn.Module):
 
         Examples
         --------
-        In order to display the window size parameters nicely, ``pprint``
-        is recommended:
+        In order to display the window size parameters nicely,
+        :func:`~pprint.pprint` is recommended:
 
         >>> from pprint import pprint
         >>> import fenestration as fen

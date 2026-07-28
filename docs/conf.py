@@ -19,7 +19,15 @@ extensions = [
     "sphinx.ext.autodoc",
     "matplotlib.sphinxext.plot_directive",
     "myst_nb",
+    "sphinx.ext.intersphinx",
 ]
+
+intersphinx_mapping = {
+    "torch": ("https://docs.pytorch.org/docs/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "python": ("https://docs.python.org/3/", None),
+}
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]

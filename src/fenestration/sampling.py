@@ -39,22 +39,22 @@ def check_sampling(
     r"""Check how sampling relates to interpolation quality.
 
     Given a function, a domain, and how to sample that domain, this
-    function will use linear algebra (``np.linalg.lstsq``) to determine
+    function will use linear algebra (:func:`numpy.linalg.lstsq`) to determine
     how to interpolate the function so that it's centered on each
-    pixel. You can then use functions like ``plot_coeffs`` and
-    ``create_movie`` to see the quality of this interpolation
+    pixel. You can then use functions like :meth:`plot_coeffs` and
+    :meth:`create_movie` to see the quality of this interpolation
 
     The idea here is to take a function (for example,
-    ``fen.pooling.gaussian``) and say that we have this function
+    :meth:`~fenestration.pooling.gaussian`) and say that we have this function
     defined at, e.g., every 10 pixels on the array ``linspace(-5, 5,
     101)``. We want to answer then, the question of how well we can
     interpolate to all the intermediate functions, that is, the
     functions centered on each pixel in the array.
 
-    You can either specify the spacing in pixels (``pix_sampling``) xor
-    in x values (``val_sampling``), but exactly one of them must be set.
+    You can either specify the spacing in pixels (:attr:`pix_sampling`) xor
+    in x values (:attr:`val_sampling`), but exactly one of them must be set.
 
-    Your function can either be a torch or numpy function, but ``x``
+    Your function can either be a torch or numpy function, but :attr:`x`
     must be the appropriate type, we will not cast it for you.
 
     Parameters
@@ -62,18 +62,18 @@ def check_sampling(
     val_sampling
         If float, how far apart (in x-values) each sampled function
         should be. This doesn't have to align perfectly with the pixels,
-        but should be close. If None, we use ``pix_sampling`` instead.
+        but should be close. If None, we use :attr:`pix_sampling` instead.
     pix_sampling
         If int, how far apart (in pixels) each sampled function should
-        be. If None, we use ``val_sampling`` instead.
+        be. If None, we use :attr:`val_sampling` instead.
     func
-        the function to check interpolation for. must take ``x`` as its
+        the function to check interpolation for. must take :attr:`x` as its
         first input, all additional kwargs can be specified in
-        ``func_kwargs``
+        :attr:`func_kwargs`
     x
-        the 1d tensor/array to evaluate ``func`` on.
+        the 1d tensor/array to evaluate :attr:`func` on.
     func_kwargs
-        additional kwargs to pass to ``func``
+        additional kwargs to pass to :attr:`func`
 
     Returns
     -------
@@ -89,7 +89,7 @@ def check_sampling(
     coeffs
         the array of coefficients to transform ``sampled`` to
         ``full``. This has been transposed from the array returned by
-        ``np.linalg.lstsq`` and thus will have the same shape as
+        :func:`np.linalg.lstsq` and thus will have the same shape as
         ``sampled`` (this is to make it easier to restrict which coeffs
         to look at, since they'll be more easily indexed along first
         dimension)
@@ -99,7 +99,7 @@ def check_sampling(
     Raises
     ------
     Exception
-        If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
+        If neither :attr:`val_sampling` nor :attr:`pix_sampling` are set to ``None``
 
     """
     if val_sampling is not None:
@@ -180,7 +180,7 @@ def interpolation_plot(
     We have two subplots: the interpolation (with optional actual
     values) and the residuals
 
-    Either ``pix`` or ``val`` must be set, and the other must be
+    Either :attr:`pix` or :attr:`val` must be set, and the other must be
     ``None``. They specify which interpolated function to display
 
     Parameters
@@ -194,7 +194,7 @@ def interpolation_plot(
     val
         we plot the interpolated function centered at this x-value
     x
-        the 1d tensor/array passed to ``check_sampling()``. the default
+        the 1d tensor/array passed to :meth:`check_sampling`. the default
         here is the default there. plotted on x-axis
     full
         the array of functions centered at each pixel. If None, won't
@@ -209,7 +209,7 @@ def interpolation_plot(
     Raises
     ------
     Exception
-        If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
+        If neither :attr:`val_sampling` nor :attr:`pix_sampling` are set to ``None``
 
     """
     if val is not None:
@@ -247,9 +247,9 @@ def create_movie(
     subplots: the interpolation (with optional actual values) and the
     residuals.
 
-    the more finely sampled your ``x`` was when calling
-    ``check_sampling()`` (and thus the larger your ``interpolated`` and
-    ``full`` arrays), the longer this will take. Calling this function
+    the more finely sampled your :attr:`x` was when calling
+    :meth:`check_sampling` (and thus the larger your :attr:`interpolated` and
+    :attr:`full` arrays), the longer this will take. Calling this function
     will not take too long, but displaying or saving the returned
     animation will.
 
@@ -260,7 +260,7 @@ def create_movie(
     residuals
         the errors for each interpolation
     x
-        the 1d tensor/array passed to ``check_sampling()``. the default
+        the 1d tensor/array passed to :meth:`check_sampling`. the default
         here is the default there. plotted on x-axis
     full
         the array of functions centered at each pixel. If None, won't
