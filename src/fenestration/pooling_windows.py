@@ -1393,9 +1393,9 @@ class PoolingWindows(nn.Module):
         sizes = {}
 
         if units == "degrees":
-            central_ecc = [self.central_eccentricity_degrees]
-            widths = [self.window_width_degrees]
-            areas = [self.window_approx_area_degrees]
+            central_ecc = [self._central_eccentricity_degrees]
+            widths = [self._window_width_degrees]
+            areas = [self._window_approx_area_degrees]
         elif units == "pixels":
             central_ecc = self.central_eccentricity_pixels
             widths = self.window_width_pixels
