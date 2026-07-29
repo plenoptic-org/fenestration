@@ -101,26 +101,6 @@ windows = torch.einsum('ahw,ehw->eahw', [angle_w, ecc_w]).flatten(0, 1)
 
 However, in order to reproduce the results in `fen.PoolingWindows`, you would also need to normalize the windows so that they have an L1-norm of 1. This ensures that each eccentricity contributes equally, which can be useful when generating model metamers.
 
-```{code-cell} ipython3
-angle_w, ecc_w = fen.create_pooling_windows(
-  scaling=0.8,
-  img_res=(256, 256),
-  min_eccentricity=1,
-  max_eccentricity=10,
-  radial_to_circumferential_ratio=2,
-  window_type="gaussian",
-  transition_region_width=None,
-  std_dev=1,
-  device="cpu"
-)
-#ecc_windows, scale_factor = fen.pooling.normalize_windows(
-#  angle_windows=angle_w,
-#  ecc_windows=ecc_w,
-#  window_eccentricity=1,
-#  scale=0
-#)
-```
-
 ## Displaying Window Values
 
 Now let's generate a figure with a noisy gradient across the image. We can then use `plot_window_values` to display the average values within each window.
