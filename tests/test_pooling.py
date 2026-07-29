@@ -233,23 +233,16 @@ class TestPooling:
         pw = pooling.PoolingWindows(0.8, rand_img.shape[-2:], cache_dir=tmp_path)
         assert pathlib.Path(pw.cache_dir) == tmp_path
         pw.save(tmp_path / "model.pt")
-        new_path = tmp_path / "newdir"
-        new_path.mkdir()
+        new_dir = tmp_path / "newdir"
+        new_dir.mkdir()
         # move cached file to new path. only 1 for num_scales=1, could do multiple
-        pathlib.Path(pw.cache_paths[0]).rename(
-            new_path / pathlib.Path(pw.cache_paths[0]).name
-        )
+        new_path = pathlib.Path(pw.cache_paths[0]).name
+        pathlib.Path(pw.cache_paths[0]).rename(new_dir / new_path)
         # load using new path where cached file now lives
-        pw_load = pooling.PoolingWindows.load(tmp_path / "model.pt", cache_dir=new_path)
-        assert pathlib.Path(pw_load.cache_dir) == new_path
-        assert pathlib.Path(new_path / pathlib.Path(pw.cache_paths[0]).name).exists()
-        assert pathlib.Path(new_path / pathlib.Path(pw.cache_paths[0]).name).is_file()
-        assert not pathlib.Path(
-            tmp_path / pathlib.Path(pw.cache_paths[0]).name
-        ).exists()
-        assert not pathlib.Path(
-            tmp_path / pathlib.Path(pw.cache_paths[0]).name
-        ).is_file()
+        pw_load = pooling.PoolingWindows.load(tmp_path / "model.pt", cache_dir=new_dir)
+        assert pathlib.Path(pw_load.cache_dir) == new_dir
+        assert (new_dir / new_path).exists()
+        assert not (tmp_path / new_path).exists()
 
     @pytest.mark.parametrize("scaling", [0.5, 1])
     @pytest.mark.parametrize("ecc", [[0.5, 10], [1, 15]])
