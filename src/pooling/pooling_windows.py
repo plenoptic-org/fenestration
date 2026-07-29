@@ -476,11 +476,17 @@ class PoolingWindows(nn.Module):
 
         This can be called as
 
-        .. function:: to(device=None, dtype=None, non_blocking=False)
+        .. code:: python
 
-        .. function:: to(dtype, non_blocking=False)
+            to(device=None, dtype=None, non_blocking=False)
 
-        .. function:: to(tensor, non_blocking=False)
+        .. code:: python
+
+            to(dtype, non_blocking=False)
+
+        .. code:: python
+
+            to(tensor, non_blocking=False)
 
         Its signature is similar to :meth:`torch.Tensor.to`, but only accepts
         floating point desired :attr:`dtype` s. In addition, this method will
@@ -527,10 +533,10 @@ class PoolingWindows(nn.Module):
         which scale_offset provides. We thus merge the dictionaries like
         so:
 
-        ```
-        for k, v in other_PoolingWindows.angle_windows.items():
-            self.angle_windows[k + scale_offset] = v
-        ```
+        .. code-block:: python
+
+            for k, v in other_PoolingWindows.angle_windows.items():
+                self.angle_windows[k + scale_offset] = v
 
         and similarly for ecc_windows and window_size
 

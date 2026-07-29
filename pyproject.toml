@@ -29,7 +29,8 @@ tests = [
 docs = [
     "sphinx",
     "pydata-sphinx-theme",
-    "myst-parser"
+    "myst-nb",
+    "jupytext",
 ]
 
 [tool.setuptools.packages.find]

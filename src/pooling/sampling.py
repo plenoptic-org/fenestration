@@ -114,16 +114,16 @@ def check_sampling(
             # we need to try the following
             pix_sampling = np.argmin(abs((x - val_sampling)[0] - x))
     try:
-        X = x.unsqueeze(1) + x[::pix_sampling]
+        X = x.unsqueeze(1) - x[::pix_sampling]
         sampled = tensors.to_numpy(func(X, **func_kwargs))
-        full_X = x.unsqueeze(1) + x
+        full_X = x.unsqueeze(1) - x
         full = tensors.to_numpy(func(full_X, **func_kwargs))
     except AttributeError:
         # numpy arrays don't have unsqueeze, so we use this `[:, None]`
         # syntax to get the same outcome
-        X = x[:, None] + x[::pix_sampling]
+        X = x[:, None] - x[::pix_sampling]
         sampled = func(X, **func_kwargs)
-        full_X = x.unsqueeze(1) + x
+        full_X = x.unsqueeze(1) - x
         full = func(full_X, func_kwargs)
     coeffs, residuals, _, _ = np.linalg.lstsq(sampled, full, rcond=None)
     interpolated = np.matmul(sampled, coeffs)
@@ -223,9 +223,9 @@ def interpolation_plot(
     ylim = [ylim[0] - np.diff(ylim) / 10, ylim[1] + np.diff(ylim) / 10]
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     axes[0].set_ylim(ylim)
-    axes[0].plot(x, interpolated[:, pix], label="interpolation")
+    axes[0].plot(x, interpolated[:, pix], zorder=0, label="interpolation")
     if full is not None:
-        axes[0].plot(x, full[:, pix], "--", zorder=0, label="actual")
+        axes[0].plot(x, full[:, pix], "--", label="actual")
         axes[0].legend()
     axes[1].stem(x, residuals)
     axes[1].scatter(x[pix], residuals[pix], c="r", zorder=10)
