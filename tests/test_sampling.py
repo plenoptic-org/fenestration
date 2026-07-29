@@ -88,3 +88,9 @@ class TestSampling:
         _, _, interps, _, _ = pooling.sampling.check_sampling(0.5, x=x_eval)
         max_idx = np.argmax(interps[check_idx])
         assert check_idx == max_idx
+
+    def test_check_residuals(self):
+        x_eval = torch.linspace(-5, 6, 101)
+        _, full, interps, _, residuals = pooling.sampling.check_sampling(0.5, x=x_eval)
+        assert np.allclose(residuals, np.pow(full - interps, 2).sum(0))
+        assert not np.allclose(residuals, np.pow(full[::-1] - interps, 2).sum(0))
