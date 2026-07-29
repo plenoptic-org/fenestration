@@ -1365,22 +1365,52 @@ class PoolingWindows(nn.Module):
             fig.legend(loc="center right", title="Angle slices")
         return fig
 
-    def summarize_window_sizes(self) -> dict:
+    def summarize_window_sizes(
+        self, units: Literal["pixels", "degrees"] = "pixels"
+    ) -> dict:
         r"""Summarize window sizes.
 
         This function returns a dictionary summarizing the window sizes
-        at the minimum and maximum eccentricity. Let ``min_window`` be
-        the window whose center is closest to ``self.min_eccentricity``
-        and ``max_window`` the one whose center is closest to
-        ``self.max_eccentricity``. We find its center, FWHM (in the
-        radial direction), and approximate area (at half-max) in
-        degrees. We do the same in pixels, for each scale.
+        at the minimum and maximum eccentricity in the specified units.
+        The ``"min_window"`` and ``"max_window"`` are those whose centers
+        are closest to ``self.min_eccentricity`` and ``self.max_eccentricity``,
+        respectively. For both of the window sizes, we return a dictionary
+        containing the center, full-width half-max (FWHM, in the radial
+        direction), and approximate area (at half-max). If ``units="pixels"``,
+        we calculate these separately for each scale.
+
+        Parameters
+        ----------
+        units
+            Which units to return the window size summary in
 
         Returns
         -------
         sizes
             dictionary with the keys described above, summarizing window
             sizes. all values are scalar floats
+
+        Raises
+        ------
+        ValueError
+            If ``units`` are not "pixels" or "degrees"
+
+        Examples
+        --------
+        In order to display the window size parameters nicely, ``pprint``
+        is recommended:
+
+        >>> import pooling
+        >>> from pprint import pprint
+        >>> pw = pooling.PoolingWindows(0.5, (256, 256))
+        >>> summary = pw.summarize_window_sizes()
+        >>> pprint(summary)
+        {'max_window_scale_0_area': np.float64(1489.7697961809874),
+        'max_window_scale_0_center': np.float64(123.18551268877933),
+        'max_window_scale_0_fwhm': np.float64(61.59275634438966),
+        'min_window_scale_0_area': np.float64(2.721047914586897),
+        'min_window_scale_0_center': np.float64(5.26463355455719),
+        'min_window_scale_0_fwhm': np.float64(2.632316777278595)}
 
         """
         min_idx = np.abs(
@@ -1390,21 +1420,25 @@ class PoolingWindows(nn.Module):
             self.central_eccentricity_degrees - self.max_eccentricity
         ).argmin()
         sizes = {}
-        central_ecc = self.central_eccentricity_degrees
-        widths = self.window_width_degrees
-        areas = self.window_approx_area_degrees
-        for extrem, idx in zip(["min", "max"], [min_idx, max_idx]):
-            sizes[f"{extrem}_window_center_degrees"] = central_ecc[idx]
-            sizes[f"{extrem}_window_fwhm_degrees"] = widths["radial_half"][idx]
-            sizes[f"{extrem}_window_area_degrees"] = areas["half"][idx]
-        central_ecc = self.central_eccentricity_pixels
-        widths = self.window_width_pixels
-        areas = self.window_approx_area_pixels
+
+        if units == "degrees":
+            central_ecc = [self.central_eccentricity_degrees]
+            widths = [self.window_width_degrees]
+            areas = [self.window_approx_area_degrees]
+        elif units == "pixels":
+            central_ecc = self.central_eccentricity_pixels
+            widths = self.window_width_pixels
+            areas = self.window_approx_area_pixels
+        else:
+            raise ValueError(
+                f"units must be one of {'pixels', 'degrees'}, not {units}!"
+            )
+
         for i in range(len(central_ecc)):
             for extrem, idx in zip(["min", "max"], [min_idx, max_idx]):
-                sizes[f"{extrem}_window_scale_{i}_center_pixels"] = central_ecc[i][idx]
-                sizes[f"{extrem}_window_scale_{i}_fwhm_pixels"] = widths[i][
-                    "radial_half"
-                ][idx]
-                sizes[f"{extrem}_window_scale_{i}_area_pixels"] = areas[i]["half"][idx]
+                scale_idx = f"_scale_{i}_" if units == "pixels" else "_"
+                sizes[f"{extrem}_window{scale_idx}center"] = central_ecc[i][idx]
+                sizes[f"{extrem}_window{scale_idx}fwhm"] = widths[i]["radial_half"][idx]
+                sizes[f"{extrem}_window{scale_idx}area"] = areas[i]["half"][idx]
+
         return sizes
