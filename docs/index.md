@@ -9,10 +9,44 @@
 
 ## Installation
 
-## Usage
+To use `fenestration` yourself, you will first need to clone the GitHub repository using the lines below, using SSH:
+
+```bash
+git clone git@github.com:plenoptic-org/fenestration.git
+```
+
+or HTTPS:
+
+```bash
+git clone https://github.com/plenoptic-org/fenestration.git
+```
+
+Then, navigate to the directory and run the following to create a virtual environment and download all dependencies:
+
+```bash
+cd fenestration
+# create virtual environment
+python -m venv .venv
+# activate environment
+.venv/Scripts/activate
+# install all dependencies
+pip install .
+```
+
+This code works with python 3.10, 3.11, 3.12, 3.13, and 3.14 in order to match [PyTorch's compatibility](https://pytorch.org/get-started/locally/).
 
 ## Related packages
 
+- [plenoptic](https://docs.plenoptic.org/docs/tags/2.1.0/index.html): This package is largely built to be compatible with plenoptic, particularly for metamer generation and for steerable pyramids. We recommend you check out plenoptic for many other stimulus processing tools!
+- [pytorch](https://pytorch.org): Optimized tensor library for deep learning using GPUs and CPUs. We require many stimulus inputs to `fenestration` to be pytorch tensors in order to support GPU and CPU processing.
+
+## Contents
+
+## Support
+
+This package is supported by the [Simons Foundation Flatiron Institute's Center
+for Computational
+Neuroscience](https://www.simonsfoundation.org/flatiron/center-for-computational-neuroscience/).
 
 ```{toctree}
 :hidden:
