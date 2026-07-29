@@ -11,6 +11,30 @@ import pooling
 from conftest import DEVICE
 
 
+def unpack_dict(pw):
+    pw_dict = pw.__dict__
+    new_dict = {}
+    for k, v in pw_dict.items():
+        if k.startswith(("_", "training")):
+            continue
+        else:
+            # check if dictionary
+            if isinstance(v, dict):
+                new_dict.update({f"{k}_{k_}": v_ for k_, v_ in v.items()})
+            # check if list of dictionaries and concat with new keys
+            elif isinstance(v, list) and v and isinstance(v[0], dict):
+                for num, d in enumerate(pw_dict[k]):
+                    new_dict.update({f"{k}_{num}_{k_}": v_ for k_, v_ in d.items()})
+            # check if list of numpy arrays and concat with new keys
+            elif isinstance(v, list) and v and isinstance(v[0], np.ndarray):
+                new_dict.update({f"{k}_{k_}": v_ for k_, v_ in enumerate(v)})
+            # if none of the above, just copy
+            else:
+                new_dict[k] = v
+
+    return new_dict
+
+
 class TestPooling:
     def test_creation(self):
         pooling.pooling.create_pooling_windows(0.87, (256, 256))
@@ -124,9 +148,9 @@ class TestPooling:
     @pytest.mark.skipif(DEVICE.type == "cpu", reason="Only makes sense to test on cuda")
     def test_PoolingWindows_todevice(self, pool_win):
         pool_win.to("cpu")
-        assert pool_win.angle_windows[0].device == "cpu"
+        assert pool_win.angle_windows[0].device.type == "cpu"
         pool_win.to("cuda")
-        assert pool_win.angle_windows[0].device == "cuda"
+        assert pool_win.angle_windows[0].device.type == "cuda"
 
     @pytest.mark.parametrize("offset", [0.2, 0.5])
     def test_PoolingWindows_merge(self, rand_img, pool_win, offset):
@@ -198,6 +222,72 @@ class TestPooling:
             pooling.PoolingWindows(
                 0.8, rand_img.shape[-2:], num_scales=2, cache_dir=tmp_path
             )
+
+    def test_PoolingWindows_save(self, rand_img, tmp_path):
+        pw = pooling.PoolingWindows(0.8, rand_img.shape[-2:])
+        pw.save(tmp_path / "model.pt")
+        assert pathlib.Path(tmp_path / "model.pt").exists()
+        assert pathlib.Path(tmp_path / "model.pt").is_file()
+
+    def test_PoolingWindows_loadcache(self, rand_img, tmp_path):
+        pw = pooling.PoolingWindows(0.8, rand_img.shape[-2:], cache_dir=tmp_path)
+        assert pathlib.Path(pw.cache_dir) == tmp_path
+        pw.save(tmp_path / "model.pt")
+        new_dir = tmp_path / "newdir"
+        new_dir.mkdir()
+        # move cached file to new path. only 1 for num_scales=1, could do multiple
+        new_path = pathlib.Path(pw.cache_paths[0]).name
+        pathlib.Path(pw.cache_paths[0]).rename(new_dir / new_path)
+        # load using new path where cached file now lives
+        pw_load = pooling.PoolingWindows.load(tmp_path / "model.pt", cache_dir=new_dir)
+        assert pathlib.Path(pw_load.cache_dir) == new_dir
+        assert (new_dir / new_path).exists()
+        assert not (tmp_path / new_path).exists()
+
+    @pytest.mark.parametrize("scaling", [0.5, 1])
+    @pytest.mark.parametrize("ecc", [[0.5, 10], [1, 15]])
+    @pytest.mark.parametrize("num_scales", [1, 3])
+    @pytest.mark.parametrize("window_type", ["gaussian", "cosine"])
+    @pytest.mark.parametrize("file_type", [".pt", ".csv"])
+    def test_PoolingWindows_saveload(
+        self, scaling, rand_img, ecc, num_scales, window_type, tmp_path, file_type
+    ):
+        pw = pooling.PoolingWindows(
+            scaling,
+            rand_img.shape[-2:],
+            min_eccentricity=ecc[0],
+            max_eccentricity=ecc[1],
+            num_scales=num_scales,
+            window_type=window_type,
+        )
+        pw_dict = unpack_dict(pw)
+
+        pw.save(tmp_path / pathlib.Path(f"./model{file_type}"))
+        pw_new = pooling.PoolingWindows.load(
+            tmp_path / pathlib.Path(f"./model{file_type}")
+        )
+        pw_new_dict = unpack_dict(pw_new)
+
+        for k, v in pw_dict.items():
+            if isinstance(pw_dict[k], (torch.Tensor, np.ndarray)):
+                assert torch.allclose(
+                    torch.as_tensor(pw_dict[k]), torch.as_tensor(pw_new_dict[k])
+                )
+            else:
+                # otherwise check individual equivalence
+                assert pw_dict[k] == pw_new_dict[k]
+
+    @pytest.mark.skipif(DEVICE.type == "cpu", reason="Only makes sense to test on cuda")
+    def test_PoolingWindows_saveload_device(self, pool_win, tmp_path):
+        pool_win.to("cuda")
+        pool_win.save(tmp_path / "model.pt")
+        assert pool_win.angle_windows[0].device.type == "cuda"
+        pw = pooling.PoolingWindows.load(tmp_path / "model.pt")
+        assert pw.angle_windows[0].device.type == "cpu"
+
+    def test_PoolingWindows_nofile_load(self):
+        with pytest.raises(FileNotFoundError, match="No such file or directory:"):
+            pooling.PoolingWindows.load("fake_file.pt")
 
     def test_PoolingWindows_sep(self, rand_img, pool_win):
         # test the window and pool function separate of the forward function
