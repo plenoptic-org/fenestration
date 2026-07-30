@@ -1,7 +1,7 @@
 (index-doc)=
-# pooling-windows
+# Fenestration
 
-Pooling Windows is a python library for generating foveated pooling windows.
+Fenestration is a python library for generating foveated pooling windows.
 
 
 ```{toctree}

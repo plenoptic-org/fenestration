@@ -1,37 +1,55 @@
 .. _api:
 
 API
----
+===
 
-Pooling Window object
----------------------
+Pooling Windows object
+----------------------
 
-The main object you will interact with is PoolingWindows which will create and plot the generated windows.
+The main object you will interact with is :class:`~fenestration.PoolingWindows` which will create
+and plot the generated windows. Additionally, :meth:`~fenestration.create_pooling_windows` will return
+the angle and eccentricity windows without the added functionality of :class:`~fenestration.PoolingWindows`.
 
-.. currentmodule:: pooling
+.. currentmodule:: fenestration
 .. autosummary::
     :toctree: generated
     :signatures: none
 
     PoolingWindows
+    create_pooling_windows
 
-.. currentmodule:: pooling.pooling
+Pooling
+-------
+
+.. currentmodule:: fenestration.pooling
 .. autosummary::
     :toctree: generated
     :signatures: none
 
-    create_pooling_windows
+    gaussian
+    raised_cosine
+    normalize_windows
 
-.. currentmodule:: pooling.sampling
+Calculate
+---------
+
+.. currentmodule:: fenestration.calculate
+.. autosummary::
+    :toctree: generated
+    :signatures: none
+
+    scaling
+    deg_to_pix
+
+Sampling
+--------
+
+.. currentmodule:: fenestration.sampling
 .. autosummary::
     :toctree: generated
     :signatures: none
 
     check_sampling
-
-.. currentmodule:: pooling.tensors
-.. autosummary::
-    :toctree: generated
-    :signatures: none
-
-    to_numpy
+    plot_coeffs
+    interpolation_plot
+    create_movie
