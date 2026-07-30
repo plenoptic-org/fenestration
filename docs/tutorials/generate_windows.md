@@ -39,7 +39,7 @@ Download the executed notebook: **{nb-download}`generate_windows.ipynb`**!
 (generate-windows-nb)=
 # Generate Windows
 
-This notebook provides tutorials on the most common ways of generating and interacting with pooling windows. These can be used generally for building foveated windows and interacting with the resulting weights across windows.
+This notebook provides tutorials on the most common ways of initializing and interacting with {class}`pooling.PoolingWindows`, which constructs foveated windows and uses them to take weighted averages across an image.
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
@@ -61,14 +61,18 @@ mpl.rcParams['ytick.labelleft'] = False
 
 ## Creating PoolingWindows Objects
 
-Let's begin by creating a `PoolingWindows` object for image size `(256,256)` and visualize the window contours that are created. We must also input a `scaling` value that determines the size of the window (see [](choosing-scaling-values)).
+Let's begin by creating a {class}`~pooling.PoolingWindows` object for image size `(256,256)` and visualize the window contours that are created. We must also input a `scaling` value that determines the size of the window (see [](choosing-scaling-values)).
 
 ```{code-cell} ipython3
 pw = pooling.PoolingWindows(0.5, (256,256))
-pw.plot_windows(subset=False)
+pw.plot_windows(subset=False);
 ```
 
-We can also change a number of other parameters that define the windows: `min_eccentricity` and `max_eccentricity` that define the extent of the windows within the image in degrees of visual angle, `num_scales` which controls the number of window scales generated, `cache_dir` for specifying a directory to cache the windows, and `window_type` which can be defined as `gaussian` or `cosine`.
+We can also change a number of other optional parameters:
+- `min_eccentricity` and `max_eccentricity` define the extent of the windows within the image to support conversion between pixels and degrees of visual angle. We do not place windows in the foveal region inside the `min_eccentricity` ring.
+- `num_scales` which controls the number of window scales generated.
+- `cache_dir` for specifying a directory to cache the windows. If windows are already cached there, will load them instead of re-creating them. If they're not present, will save them after creation.
+- ` window_type` which can be defined as `gaussian` or `cosine`
 
 ```{code-cell} ipython3
 pw = pooling.PoolingWindows(
@@ -78,10 +82,10 @@ pw = pooling.PoolingWindows(
   max_eccentricity=10,
   window_type='cosine'
   )
-pw.plot_windows()
+pw.plot_windows();
 ```
 
-If you want to just generate the eccentricity rings and angular wedges separately, you can also call `pooling.create_pooling_windows`. Here we will use `scaling=2` and and image size of `(256,256)`. We will also take advantage of [plenoptic's](https://plenoptic.org/) plotting function `po.imshow`.
+If you want to just generate the eccentricity rings and angular wedges separately, you can also call {meth}`~pooling.pooling.create_pooling_windows`. Here we will use `scaling=2` and and image size of `(256,256)`. We will also take advantage of [plenoptic's](https://plenoptic.org/) plotting function `po.imshow`.
 
 ```{code-cell} ipython3
 import plenoptic as po
@@ -93,29 +97,32 @@ fig = po.plot.imshow(angle_w.unsqueeze(0))
 plt.show()
 ```
 
-It is also simple to reconstruct the windows from this angle and eccentricity data.
+It is also possible to reconstruct the full windows from the separate angle and eccentricity tensors, though note this may take up a lot of memory! We can visualize each of the windows by indexing the first dimension of `windows`.
 
 ```{code-cell} ipython3
 windows = torch.einsum('ahw,ehw->eahw', [angle_w, ecc_w]).flatten(0, 1)
+plt.imshow(windows[0,:,:]);
 ```
 
-However, in order to reproduce the results in `pooling.PoolingWindows`, you would also need to normalize the windows so that they have an L1-norm of 1. This ensures that each eccentricity contributes equally, which can be useful when generating model metamers.
+However, in order to reproduce the outputs of {class}`~pooling.PoolingWindows`, you would also need to normalize the windows (using {meth}`pooling.pooling.normalize_windows`) so that they have an L1-norm of 1. This ensures that each eccentricity contributes equally, which can be useful when generating model metamers.
 
 ## Displaying Window Values
 
-Now let's generate a figure with a noisy gradient across the image. We can then use `plot_window_values` to display the average values within each window.
+Now let's generate a figure with a noisy gradient across the image. We can then use {meth}`~pooling.PoolingWindows.plot_window_values` to display the average values within each window.
 
 ```{code-cell} ipython3
 img = torch.rand((1, 1, 256, 256), dtype=torch.float32) * torch.range(1/256,1,1/256)
-plt.imshow(torch.squeeze(img), cmap='gray')
+plt.imshow(torch.squeeze(img), cmap='gray');
 ```
+
+Since we are "pooling" the input within each window, we see a smooth gradient across the windows returned after averaging across the noise.
 
 ```{code-cell} ipython3
 pw = pooling.PoolingWindows(0.8, (256,256))
-pw.plot_window_values(img, subset=False)
+pw.plot_window_values(img, subset=False);
 ```
 
-If you would like a summary of the size and values associated with the pooling windows, you can call `summarize_window_sizes` for either pixels or degrees.
+If you would like a summary of the size and values associated with the pooling windows, you can call {meth}`~pooling.PoolingWindows.summarize_window_sizes` for either pixels or degrees. Here, we use [pprint](https://docs.python.org/3/library/pprint.html) to help us cleanly display the dictionary of sizes.
 
 ```{code-cell} ipython3
 from pprint import pprint
@@ -126,7 +133,7 @@ pprint(summary)
 ```
 
 ## Checking Windows
-We also have a few additional visualization functions, including plotting the window widths and areas:
+We also have a few additional visualization functions, including plotting the window widths (left) and areas (right). Both of these figures show the window sizes along the y axes as the eccentricity increases along the x axes, measured in degrees of visual angle (calculated based on `min_eccentricity` and `max_eccentricity`). The window widths depict two measurements: width of the windows along the radial (long) axis and angular (short) axis. Each individual window's size is defined by three measurements: 'top', 'half', and 'full' widths. Top is the width of the flat-top region of each window where the window's value is 1 (only present for cosine windows); full is the width of the entire window; half is the width at the half-max value. To get the approximate area, we multiply the radial width against the corresponding angular width, then divide by {math}`\frac{\pi}{4}`.
 
 ```{code-cell} ipython3
 mpl.rcParams['xtick.bottom'] = True
@@ -139,7 +146,7 @@ pw.plot_window_widths(ax=ax[0]);
 pw.plot_window_areas(ax=ax[1]);
 ```
 
-and checking whether the windows have been normalized properly:
+We can also check whether the windows have been normalized properly so that they have an L1-norm of 1 to ensure that each eccentricity contributes equally. The first row shows the L1-norm of the windows, the second shows the sum. Each row will have one plot and, if everything worked correctly, they should each look like a sigmoid function that runs from 1 for small eccentricities to 0 for high eccentricities, measured in degrees of visual angle.
 
 ```{code-cell} ipython3
 pw.plot_window_checks();
@@ -148,7 +155,11 @@ pw.plot_window_checks();
 (choosing-scaling-values)=
 ## Choosing Scaling Values
 
-However, the `scaling` values used in previous examples were arbitrary. Let's say you are displaying images for an experiment and want to build pooling windows ranging from 1-10 degrees of eccentricity, tiling the space with 5 angular windows. You can then find the precise scaling value to generate the corresponding `PoolingWindows` object.
+However, the `scaling` values used in previous examples were arbitrary. Let's take a deeper dive into the meaning of `scaling`, which is defined as the ratio of a window's radial full-width at half-maximum to eccentricity.
+
+As shown in [Freeman, J., & Simoncelli, E. P. (2011). Metamers of the ventral stream. Nature Neuroscience.](https://www.nature.com/articles/nn.2889#Sec9), `scaling` values were adjusted to match specific behavioral thresholds for discriminating metameric stimuli. Additionally, in [Broderick, W. F., Rufo, G., Winawer, J. & Simoncelli, E. P. (2023). Foveated metamers of the early visual system. eLife.](https://elifesciences.org/reviewed-preprints/90554), the goal was to find the largest `scaling` value for generating metamers at which human and model discrimination performance was matched, and they showed how this critical value is impacted by image statistics, types of discrimination, and metamer synthesis initialization.
+
+Here, we present a tool for calculating a specific `scaling` value based on some constraints. Say you are displaying images for an experiment and want to build pooling windows ranging from 1-10 degrees of eccentricity, tiling the radial space with 5 windows. You can then find the precise scaling value to generate the corresponding {class}`PoolingWindows` object:
 
 ```{code-cell} ipython3
 scaling = pooling.calculate.scaling(n_windows=5, min_ecc=1, max_ecc=10, std_dev=1)
