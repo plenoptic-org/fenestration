@@ -1,4 +1,4 @@
-"""Pooling Windows is a python library for generating foveated pooling windows."""
+"""Fenestration is a python library for generating foveated pooling windows."""
 
 __all__ = [
     "__version__",

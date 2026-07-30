@@ -18,16 +18,14 @@ poster](https://osf.io/aketq/), [VSS 2023 poster](https://osf.io/8hdaz/),
 [preprint](https://www.biorxiv.org/content/10.1101/2023.05.18.541306)), and
 notably improved the quality of V1 and retinal metamers. A more detailed
 discussion of the differences between the Gaussian and raised-cosine windows can
-be found at the top of
-[pooling.py](https://github.com/LabForComputationalVision/pooling-windows/blob/main/pooling/pooling.py#L3).
+be found in [tutorials](https://pooling-windows.readthedocs.io/en/latest/tutorials/index.html).
 
 ## Requirements
 
 This code works with python 3.10, 3.11, 3.12, 3.13, and 3.14 in order to match [PyTorch's compatibility](https://pytorch.org/get-started/locally/). To install all necessary dependencies, run `pip install .`; you
 will then be able to use the code here from within this directory.
 
-If you wish to view the included notebook (which contains a simple demonstration
-of some sampling and aliasing issues), you will also need to install
+If you wish to run included tutorial notebooks, you will also need to install
 [jupyter](https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html). Additionally, some of the examples use
 [plenoptic](https://github.com/plenoptic-org/plenoptic) -- if you
 wish to use it, you must install that package as well (follow the instructions
@@ -48,7 +46,7 @@ that down:
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-import pooling
+import fenestration as fen
 
 img = torch.from_numpy(plt.imread('path/to/image.png').astype(np.float32)) / 255
 ```
@@ -71,11 +69,10 @@ while img.ndim < 4:
   The only necessary ones are `scaling`, which sets the relationship between the
   width of the windows and eccentricity, and `img_res`, which gives the height
   and width of the input. In the example below, we construct Gaussian windows.
-  To instead construct raised-cosine ones, set `window_type='cosine'` and remove
-  the `std_dev` argument.
+  To instead construct raised-cosine ones, set `window_type='cosine'`.
 
 ``` python
-pw = pooling.PoolingWindows(.5, img.shape[-2:], window_type='gaussian', std_dev=1)
+pw = fen.PoolingWindows(.5, img.shape[-2:], window_type='gaussian')
 ```
 
 - Call `PoolingWindows.forward()` on the image! Note that `pw(img)` and
@@ -95,7 +92,7 @@ an int, giving the scale):
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-import pooling
+import fenestration as fen
 import plenoptic as po
 
 img = torch.from_numpy(plt.imread('path/to/image.png').astype(np.float32)) / 255
@@ -113,7 +110,7 @@ for k, v in pyr_coeffs.items():
     print(f'scale {k[0]}, orientation band {k[1]}: {v.shape}')
 # create the windows. Note that we're now setting the number of scales!
 # This must be the same as the height of the pyramid
-pw = pooling.PoolingWindows(.5, img.shape[-2:], window_type='gaussian',
+pw = fen.PoolingWindows(.5, img.shape[-2:], window_type='gaussian',
                             std_dev=1, num_scales=4)
 # pooled_coeffs will have the same keys as pyr_coeffs, and its values will
 # be the pooled versions of the corresponding value in pyr_coeffs

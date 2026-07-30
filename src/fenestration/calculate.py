@@ -1,6 +1,7 @@
 """Helpfer functions for calculating pooling window components.
 
-These functions are used in pooling_windows.py which contains the
+These functions are primarily for performing calculations and
+unit conversions used in pooling_windows.py which contains the
 PoolingWindows class, or in pooling.py which contains the
 create_pooling_windows module.
 
@@ -275,7 +276,7 @@ def scaling(
     :math:`x_h=\sigma\sqrt{2\log 2}`.
 
     It turns out that this holds for all permissible values of
-    :attr:`transition_region_width` (:math:`t` in the equations) (try
+    ``transition_region_width`` (:math:`t` in the equations) (try
     playing around with some plots if you don't believe me).
 
     Full-width half-maximum, :math:`W`, the difference between the two

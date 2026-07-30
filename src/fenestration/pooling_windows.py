@@ -169,13 +169,13 @@ class PoolingWindows(nn.Module):
     window_max_amplitude : float
         The max amplitude of an individual window. This will always be 1
         for raised-cosine windows. For gaussian windows, this value depends
-        on the standard deviation, which is currently hard-coded at ``1``.
+        on the standard deviation, which is currently hard-coded at 1.
         Therefore, for gaussian windows it's approximately 0.16.
     window_intersecting_amplitude : float
         The amplitude at which two neighboring windows intersect. This
         will always be .5 for raised-cosine windows, but for gaussian ones,
         this value depends on the standard deviation. This value is currently
-        hard-coded at ``1``, therefore it's half a standard deviation away from
+        hard-coded at 1, therefore it's half a standard deviation away from
         the center, approximately 0.14.
 
     See Also
@@ -1351,12 +1351,13 @@ class PoolingWindows(nn.Module):
         r"""Summarize window sizes.
 
         This function returns a dictionary summarizing the window sizes
-        at the minimum and maximum eccentricity. Let `min_window`` be
-        the window whose center is closest to :attr:`min_ecc`
-        and ``max_window`` the one whose center is closest to
-        :attr:`max_ecc`. If ``units="degrees"``, we find its
-        center, FWHM (in the radial direction), and approximate area (at
-        half-max). If ``units="pixels"``, we do the same for each scale.
+        at the minimum and maximum eccentricity in the specified units.
+        The ``"min_window"`` and ``"max_window"`` are those whose centers
+        are closest to :attr:`min_ecc` and :attr:`max_ecc`,
+        respectively. For both of the window sizes, we return a dictionary
+        containing the center, full-width half-max (FWHM, in the radial
+        direction), and approximate area (at half-max). If ``units="pixels"``,
+        we calculate these separately for each scale.
 
         Parameters
         ----------

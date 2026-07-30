@@ -665,9 +665,9 @@ def normalize_windows(
         the normalized ecc_windows.
     scale_factor
         the scale_factor used to normalize eccentricity windows
-        (as a 3d tensor, number of eccentricity windows by 1 by
-        1). stored by ``PoolingWindows`` object so we can undo it for
-        ``project()`` or plotting purposes
+        (as a 3d tensor, number of eccentricity windows by 1 by 1). Stored by
+        :class:`~fenestration.PoolingWindows` object so we can undo it for
+        :meth:`~fenestration.PoolingWindows.project` or plotting purposes.
 
     """
     # pick some window with a middling eccentricity
