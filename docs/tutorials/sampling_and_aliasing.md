@@ -6,7 +6,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.17.3
 kernelspec:
-  display_name: pooling
+  display_name: fenestration
   language: python
   name: python3
 ---

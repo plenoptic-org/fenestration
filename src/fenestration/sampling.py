@@ -89,7 +89,7 @@ def check_sampling(
     coeffs
         the array of coefficients to transform ``sampled`` to
         ``full``. This has been transposed from the array returned by
-        :func:`np.linalg.lstsq` and thus will have the same shape as
+        :func:`numpy.linalg.lstsq` and thus will have the same shape as
         ``sampled`` (this is to make it easier to restrict which coeffs
         to look at, since they'll be more easily indexed along first
         dimension)
