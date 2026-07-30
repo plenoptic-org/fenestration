@@ -6,9 +6,9 @@ API
 Pooling Windows object
 ----------------------
 
-The main object you will interact with is `PoolingWindows` which will create
-and plot the generated windows. Additionally, `create_pooling_windows` will return
-the angle and eccentricity windows without the added functionality of `PoolingWindows`.
+The main object you will interact with is :class:`~fenestration.PoolingWindows` which will create
+and plot the generated windows. Additionally, :meth:`~fenestration.create_pooling_windows` will return
+the angle and eccentricity windows without the added functionality of :class:`~fenestration.PoolingWindows`.
 
 .. currentmodule:: fenestration
 .. autosummary::
