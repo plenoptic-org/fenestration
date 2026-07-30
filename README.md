@@ -172,20 +172,6 @@ found on the `master` branch).
    commit](https://github.com/LabForComputationalVision/plenoptic/tree/fb1c4d29c645c9a054baa021c7ffd07609b181d4)
    contains all the code before transferring it to this repo.
 
-## Code structure
-
-  - `tests/`: some tests (run on every push using Github actions)
-    to make sure necessary functionality does not change with updates.
-  - `src/fenestration/`: python module containing the code for the pooling windows.
-    - `pooling_windows.py`: contains the `PoolingWindows` class, which is how
-      users should primarily interact with this code.
-    - `pooling.py`: variety of functions that allow for constructing and
-      investigating the windows, used by `PoolingWindows`.
-    - `calculate.py`: variety of calculations, used by `PoolingWindows`
-    - `__init__.py`: boilerplate file for making `pooling` a module.
-    - `sampling.py`: checks sampling and aliasing issues, used by the
-      `Sampling and Aliasing` tutorial, but not by `PoolingWindows`.
-
 ## References
 
 [^1]: Freeman, J., & Simoncelli, E. P. (2011). Metamers of the ventral stream.
