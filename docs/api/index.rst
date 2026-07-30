@@ -14,8 +14,13 @@ the angle and eccentricity windows without the added functionality of :class:`~f
 .. autosummary::
     :toctree: generated
     :signatures: none
+    :template: pw_module.rst.jinja
 
     PoolingWindows
+
+    :toctree: generated
+    :signatures: none
+
     create_pooling_windows
 
 Pooling
