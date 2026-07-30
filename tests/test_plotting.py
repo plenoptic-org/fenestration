@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import plenoptic as po
 import pytest
 
-import pooling
+import fenestration as fen
 
 # necessary to avoid issues with animate:
 # https://github.com/matplotlib/matplotlib/issues/10287/
@@ -109,7 +109,7 @@ class TestPlotting:
         )
 
     def test_po_tensor_plot(self):
-        angle_w, ecc_w = pooling.pooling.create_pooling_windows(0.87, (256, 256))
+        angle_w, ecc_w = fen.pooling.create_pooling_windows(0.87, (256, 256))
         po.plot.imshow(ecc_w.unsqueeze(0))
         po.plot.imshow(angle_w.unsqueeze(0))
 

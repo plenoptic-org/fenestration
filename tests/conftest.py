@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-import pooling
+import fenestration as fen
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -13,4 +13,4 @@ def rand_img():
 
 @pytest.fixture(scope="package")
 def pool_win(rand_img):
-    return pooling.PoolingWindows(0.5, rand_img.shape[2:], num_scales=2)
+    return fen.PoolingWindows(0.5, rand_img.shape[2:], num_scales=2)

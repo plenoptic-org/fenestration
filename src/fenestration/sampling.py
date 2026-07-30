@@ -19,7 +19,7 @@ import torch
 from matplotlib import animation
 from matplotlib.figure import Figure
 
-from . import tensors
+from . import _tensors
 from .pooling import gaussian
 
 __all__ = ["check_sampling", "plot_coeffs", "interpolation_plot", "create_movie"]
@@ -45,7 +45,7 @@ def check_sampling(
     ``create_movie`` to see the quality of this interpolation
 
     The idea here is to take a function (for example,
-    ``pooling.pooling.gaussian``) and say that we have this function
+    ``fen.pooling.gaussian``) and say that we have this function
     defined at, e.g., every 10 pixels on the array ``linspace(-5, 5,
     101)``. We want to answer then, the question of how well we can
     interpolate to all the intermediate functions, that is, the
@@ -115,9 +115,9 @@ def check_sampling(
             pix_sampling = np.argmin(abs((x - val_sampling)[0] - x))
     try:
         X = x.unsqueeze(1) - x[::pix_sampling]
-        sampled = tensors.to_numpy(func(X, **func_kwargs))
+        sampled = _tensors._to_numpy(func(X, **func_kwargs))
         full_X = x.unsqueeze(1) - x
-        full = tensors.to_numpy(func(full_X, **func_kwargs))
+        full = _tensors._to_numpy(func(full_X, **func_kwargs))
     except AttributeError:
         # numpy arrays don't have unsqueeze, so we use this `[:, None]`
         # syntax to get the same outcome
@@ -218,7 +218,7 @@ def interpolation_plot(
         # this will get us the closest value, if there's no exactly
         # correct one.
         pix = np.argmin(abs(x - val))
-    x = tensors.to_numpy(x)
+    x = _tensors._to_numpy(x)
     ylim = [interpolated.min(), interpolated.max()]
     ylim = [ylim[0] - np.diff(ylim) / 10, ylim[1] + np.diff(ylim) / 10]
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
@@ -272,12 +272,10 @@ def create_movie(
     Returns
     -------
     anim
-        The animation object. In order to view, must convert to HTML
-        (call ``pooling.tensors.convert_anim_to_html(anim)``) or save (call
-        ``anim.save(movie.mp4)``, must have ``ffmpeg`` installed).
+        The animation object.
 
     """
-    x = tensors.to_numpy(x)
+    x = _tensors._to_numpy(x)
     fig = interpolation_plot(interpolated, residuals, x=x, full=full)
     if full is not None:
         full_line = fig.axes[0].lines[1]

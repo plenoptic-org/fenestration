@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "pooling-windows"
+project = "fenestration"
 copyright = "2026, Flatiron NeuroRSE"
 author = "Flatiron NeuroRSE"
 

@@ -10,14 +10,14 @@ from contextlib import suppress
 import numpy as np
 import torch
 
-__all__ = ["to_numpy"]
+__all__ = []
 
 
 def __dir__() -> list[str]:
     return __all__
 
 
-def to_numpy(x: torch.Tensor | np.ndarray) -> np.ndarray:
+def _to_numpy(x: torch.Tensor | np.ndarray) -> np.ndarray:
     r"""Cast tensor to numpy in the most conservative way possible.
 
     Parameters
