@@ -71,5 +71,8 @@ html_static_path = ["_static"]
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 
+# SPHINX CROSS REFERENCES
+add_function_parentheses = False
+
 # Enable automatic stub page generation
 autosummary_generate = True
