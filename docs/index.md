@@ -30,17 +30,15 @@ python -m venv .venv
 # activate environment
 .venv/Scripts/activate
 # install all dependencies
-pip install .
+pip install -e .
 ```
 
-This code works with python 3.10, 3.11, 3.12, 3.13, and 3.14 in order to match [PyTorch's compatibility](https://pytorch.org/get-started/locally/).
+This code works with Python 3.10, 3.11, 3.12, 3.13, and 3.14 in order to match [PyTorch's compatibility](https://pytorch.org/get-started/locally/).
 
 ## Related packages
 
 - [plenoptic](https://docs.plenoptic.org/docs/tags/2.1.0/index.html): This package is largely built to be compatible with plenoptic, particularly for metamer generation and for steerable pyramids. We recommend you check out plenoptic for many other stimulus processing tools!
 - [pytorch](https://pytorch.org): Optimized tensor library for deep learning using GPUs and CPUs. We require many stimulus inputs to `fenestration` to be pytorch tensors in order to support GPU and CPU processing.
-
-## Contents
 
 ## Support
 

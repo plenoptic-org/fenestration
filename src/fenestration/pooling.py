@@ -41,7 +41,6 @@ from . import _tensors, calculate
 __all__ = [
     "gaussian",
     "raised_cosine",
-    "create_pooling_windows",
     "normalize_windows",
 ]
 
