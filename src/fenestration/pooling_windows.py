@@ -552,10 +552,10 @@ class PoolingWindows(nn.Module):
         r"""Window and pool the input.
 
         We take an input, either a 4d tensor or a dictionary of 4d
-        tensors, and return a windowed version of it. If it's a 4d
-        tensor, we return a 5d tensor, with windows indexed along the
+        tensors, and return the pooled window averages. If it's a 4d
+        tensor, we return a 3d tensor, with windows indexed along the
         3rd dimension. If it's a dictionary, we return a dictionary with
-        the same keys and have changed all the values to 5d tensors,
+        the same keys and have changed all the values to 3d tensors,
         with windows indexed along the 3rd dimension.
 
         If it's a 4d tensor, we use the ``idx`` entry in the ``windows``
