@@ -462,11 +462,11 @@ class PoolingWindows(nn.Module):
             to(tensor, non_blocking=False)
 
         Its signature is similar to :meth:`torch.Tensor.to`, but only accepts
-        floating point desired :attr:`dtype` s. In addition, this method will
-        only cast the floating point parameters and buffers to :attr:`dtype`
+        floating point desired ``dtype`` s. In addition, this method will
+        only cast the floating point parameters and buffers to ``dtype``
         (if given). The integral parameters and buffers will be moved to
-        :attr:`device`, if that is given, but with :attr:`dtype` s unchanged. When
-        :attr:`non_blocking` is set, it tries to convert/move asynchronously
+        ``device``, if that is given, but with ``dtype`` s unchanged. When
+        ``non_blocking`` is set, it tries to convert/move asynchronously
         with respect to the host if possible, e.g., moving CPU Tensors with
         pinned memory to CUDA devices.
 
@@ -505,7 +505,7 @@ class PoolingWindows(nn.Module):
         dictionaries of two PoolingWindows objects. Since they will both
         have similarly-indexed keys (0, 1, 2,... based on
         :attr:`num_scales`), we need some offset to keep them separate,
-        which :attr:`scale_offset` provides. We thus merge the dictionaries like
+        which ``scale_offset`` provides. We thus merge the dictionaries like
         so:
 
         .. code-block:: python
@@ -584,7 +584,7 @@ class PoolingWindows(nn.Module):
         Returns
         -------
         pooled_x
-            Same type as :attr:`x`, see above for how it's created.
+            Same type as ``x``, see above for how it's created.
 
         See Also
         --------
@@ -635,7 +635,7 @@ class PoolingWindows(nn.Module):
         the same keys and have changed all the values to 5d tensors,
         with windows indexed along the 3rd dimension.
 
-        If it's a 4d tensor, we use the :attr:`idx` entry in the ``windows``
+        If it's a 4d tensor, we use the ``idx`` entry in the ``windows``
         list. If it's a dictionary, we assume it's keys are ``(scale,
         orientation)`` tuples and so use ``windows[key[0]]`` to find the
         appropriately-sized window (this is the case for, e.g., the
@@ -648,12 +648,12 @@ class PoolingWindows(nn.Module):
             Either a 4d tensor or a dictionary of 4d tensors
         idx
             Which entry in the ``windows`` list to use. Only used if
-            :attr:`x` is a tensor
+            ``x`` is a tensor
 
         Returns
         -------
         windowed_x
-            Same type as :attr:`x`, see above for how it's created
+            Same type as ``x``, see above for how it's created
 
         Raises
         ------
@@ -716,7 +716,7 @@ class PoolingWindows(nn.Module):
         a 3d tensor or a dictionary of 3d tensors.
 
         Similar to :meth:`window`, if it's a tensor, we use the
-        :attr:`idx` entry in the ``windows`` list. If it's a dictionary, we
+        ``idx`` entry in the ``windows`` list. If it's a dictionary, we
         assume it's keys are ``(scale, orientation)`` tuples and so use
         ``windows[key[0]]`` to find the appropriately-sized window (this
         is the case for, e.g., the steerable pyramid). If we want to use
@@ -729,12 +729,12 @@ class PoolingWindows(nn.Module):
             Either a 5d tensor or a dictionary of 5d tensors
         idx
             Which entry in the ``windows`` list to use. Only used if
-            :attr:`windowed_x` is a tensor
+            ``windowed_x`` is a tensor
 
         Returns
         -------
         pooled_x
-            Same type as :attr:`windowed_x`, see above for how it's created.
+            Same type as ``windowed_x``, see above for how it's created.
 
         See Also
         --------
@@ -778,7 +778,7 @@ class PoolingWindows(nn.Module):
             3d Tensor or a dictionary of 3d tensors
         idx
             Which entry in the ``windows`` list to use. Only used if
-            :attr:`pooled_x` is a tensor.
+            ``pooled_x`` is a tensor.
 
         Returns
         -------
@@ -960,7 +960,7 @@ class PoolingWindows(nn.Module):
             The axis to plot the windows on. If None, will create a new
             figure with 1 axis.
         contour_levels
-            The :attr:`levels` argument to pass to
+            The ``levels`` argument to pass to
             :meth:`~matplotlib.axes.Axes.contour`. From that
             documentation: "Determines the number and positions of the
             contour lines / regions. If an int ``n``, use ``n`` data
@@ -1133,7 +1133,7 @@ class PoolingWindows(nn.Module):
         windows at their central eccentricity
 
         If the unit is 'pixels', then we also need to know which
-        :attr:`scale_num` to plot (the windows are created at different
+        ``scale_num`` to plot (the windows are created at different
         scales, and so come in different pixel sizes)
 
         Parameters
@@ -1164,7 +1164,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         Exception
-            If :attr:`units` are not 'pixels' or 'degrees'
+            If ``units`` are not 'pixels' or 'degrees'
 
         """
         if units == "degrees":
@@ -1227,7 +1227,7 @@ class PoolingWindows(nn.Module):
         windows at their central eccentricity.
 
         If the unit is 'pixels', then we also need to know which
-        :attr:`scale_num` to plot (the windows are created at different
+        ``scale_num`` to plot (the windows are created at different
         scales, and so come in different pixel sizes).
 
         Parameters
@@ -1252,7 +1252,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         Exception
-            If :attr:`units` are not 'pixels' or 'degrees'
+            If ``units`` are not 'pixels' or 'degrees'
 
         """
         if units == "degrees":

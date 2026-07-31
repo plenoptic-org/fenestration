@@ -51,10 +51,10 @@ def check_sampling(
     interpolate to all the intermediate functions, that is, the
     functions centered on each pixel in the array.
 
-    You can either specify the spacing in pixels (:attr:`pix_sampling`) XOR
-    in x values (:attr:`val_sampling`), but exactly one of them must be set.
+    You can either specify the spacing in pixels (``pix_sampling``) XOR
+    in x values (``val_sampling``), but exactly one of them must be set.
 
-    Your function can either be a torch or numpy function, but :attr:`x`
+    Your function can either be a torch or numpy function, but ``x``
     must be the appropriate type, we will not cast it for you.
 
     Parameters
@@ -62,18 +62,18 @@ def check_sampling(
     val_sampling
         If float, how far apart (in x-values) each sampled function
         should be. This doesn't have to align perfectly with the pixels,
-        but should be close. If None, we use :attr:`pix_sampling` instead.
+        but should be close. If None, we use ``pix_sampling`` instead.
     pix_sampling
         If int, how far apart (in pixels) each sampled function should
-        be. If None, we use :attr:`val_sampling` instead.
+        be. If None, we use ``val_sampling`` instead.
     func
-        the function to check interpolation for. must take :attr:`x` as its
+        The function to check interpolation for. Must take ``x`` as its
         first input, all additional kwargs can be specified in
-        :attr:`func_kwargs`
+        ``func_kwargs``.
     x
-        the 1d tensor/array to evaluate :attr:`func` on.
+        The 1d tensor/array to evaluate ``func`` on.
     func_kwargs
-        additional kwargs to pass to :attr:`func`
+        Additional kwargs to pass to ``func``
 
     Returns
     -------
@@ -101,7 +101,7 @@ def check_sampling(
     ValueError
         If ``x`` is not set
     Exception
-        If neither :attr:`val_sampling` nor :attr:`pix_sampling` are set to ``None``
+        If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
 
     """
     if x is None:
@@ -184,7 +184,7 @@ def interpolation_plot(
     We have two subplots: the interpolation (with optional actual
     values) and the residuals
 
-    Either :attr:`pix` or :attr:`val` must be set, and the other must be
+    Either ``pix`` or ``val`` must be set, and the other must be
     ``None``. They specify which interpolated function to display
 
     Parameters
@@ -215,7 +215,7 @@ def interpolation_plot(
     ValueError
         If ``x`` is not set
     Exception
-        If neither :attr:`val_sampling` nor :attr:`pix_sampling` are set to ``None``
+        If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
 
     """
     if x is None:
@@ -255,9 +255,9 @@ def create_movie(
     subplots: the interpolation (with optional actual values) and the
     residuals.
 
-    the more finely sampled your :attr:`x` was when calling
-    :meth:`check_sampling` (and thus the larger your :attr:`interpolated` and
-    :attr:`full` arrays), the longer this will take. Calling this function
+    the more finely sampled your ``x`` was when calling
+    :meth:`check_sampling` (and thus the larger your ``interpolated`` and
+    ``full`` arrays), the longer this will take. Calling this function
     will not take too long, but displaying or saving the returned
     animation will.
 

@@ -663,12 +663,12 @@ def _window_widths_actual(
 def deg_to_pix(img_res: tuple[int, int], max_ecc: float = 15) -> float:
     r"""Calculate the degree-to-pixel conversion factor.
 
-    We assume :attr:`img_res` is the full resolution of the image and
-    :attr:`max_ecc` is the radius of the image in degrees. Thus, we
-    divide half of :attr:`img_res` by :attr:`max_ecc`. However, we want
+    We assume ``img_res`` is the full resolution of the image and
+    ``max_ecc`` is the radius of the image in degrees. Thus, we
+    divide half of ``img_res`` by ``max_ecc``. However, we want
     to be able to handle non-square images, so we assume the value you
-    want to use is the max of the two numbers in :attr:`img_res` (this is
-    the way we construct the PoolingWindow objects; we want the windows
+    want to use is the max of the two numbers in ``img_res`` (this is
+    the way we construct the ``PoolingWindow`` objects; we want the windows
     to fill the full image).
 
     Parameters

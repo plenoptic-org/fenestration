@@ -101,8 +101,8 @@ def gaussian(x: float | np.ndarray, std_dev: float | None = 1) -> np.ndarray:
 
     When ``std_dev>1``, the windows overlap more. As with the
     probability density function of a normal distribution, we divide by
-    :attr:`std_dev` to keep the integral constant for different values of
-    :attr:`std_dev` (though the integral is not 1). This means that summing
+    ``std_dev`` to keep the integral constant for different values of
+    ``std_dev`` (though the integral is not 1). This means that summing
     across multiple windows will still give us a value of 1.
 
     """
@@ -129,16 +129,16 @@ def raised_cosine(
     Returns
     -------
     array
-        The value of the raised cosine window at each value of :attr:`x`.
+        The value of the raised cosine window at each value of ``x``.
 
     Raises
     ------
     Exception
-        If :attr:`transition_region_width` is not between 0 and 1
+        If ``transition_region_width`` is not between 0 and 1
 
     Notes
     -----
-    For :attr:`x` values outside the function's domain, we return 0
+    For ``x`` values outside the function's domain, we return 0
 
     Equation 9 from the online methods of [3]_.
 
@@ -213,8 +213,8 @@ def _polar_angle_windows(
     window_type
         Whether to use the raised cosine function from [4]_ or a
         Gaussian that has approximately the same structure. If cosine,
-        :attr:`transition_region_width` must be set; if gaussian, then
-        :attr:`std_dev` must be set
+        ``transition_region_width`` must be set; if gaussian, then
+        ``std_dev`` must be set
     transition_region_width
         The width of the cosine windows' transition region, parameter
         :math:`t` in equation 9 from the online methods.
@@ -234,9 +234,9 @@ def _polar_angle_windows(
     Raises
     ------
     Exception
-        If :attr:`n_windows` is not an integer
+        If ``n_windows`` is not an integer
     Exception
-        If :attr:`n_windows` is not greater than 8*``std_dev``
+        If ``n_windows`` is not greater than 8*``std_dev``
 
     Notes
     -----
@@ -454,9 +454,9 @@ def create_pooling_windows(
         degrees). Parameter :math:`e_r` in equation 11 of the online
         methods.
     radial_to_circumferential_ratio
-        :attr:`scaling` determines the number of log-eccentricity windows we
+        ``scaling`` determines the number of log-eccentricity windows we
         can create; this ratio gives us the number of polar angle
-        ones. Based on :attr:`scaling`, we calculate the width of the windows
+        ones. Based on ``scaling``, we calculate the width of the windows
         in log-eccentricity, and then divide that by this number to get
         their width in polar angle. Because we require an integer number
         of polar angle windows, we round the resulting number of polar
@@ -466,7 +466,7 @@ def create_pooling_windows(
     window_type
         Whether to use the raised cosine function from [6]_ or a Gaussian that
         has approximately the same structure. If cosine,
-        :attr:`transition_region_width` must be set; if gaussian, then :attr:`std_dev`
+        ``transition_region_width`` must be set; if gaussian, then ``std_dev``
         must be set.
     transition_region_width
         The width of the transition region, parameter :math:`t` in
@@ -483,13 +483,13 @@ def create_pooling_windows(
     angle_windows
         The 3d tensor of 2d polar angle windows. Its shape will be
         ``(n_angle_windows, *img_res)``, where the number of windows
-        is inferred in this function based on the values of :attr:`scaling`
-        and :attr:`radial_to_circumferential_width`.
+        is inferred in this function based on the values of ``scaling``
+        and ``radial_to_circumferential_ratio``.
     ecc_windows
         The 3d tensor of 2d log-eccentricity windows. Its shape will be
         ``(n_eccen_windows, *img_res)``, where the number of windows
-        is inferred in this function based on the values of :attr:`scaling`,
-        :attr:`min_ecc`, and :attr:`max_ecc`.
+        is inferred in this function based on the values of ``scaling``,
+        ``min_ecc``, and ``max_ecc``.
 
     See Also
     --------
