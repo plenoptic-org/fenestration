@@ -10,6 +10,7 @@ pooling.py contains a lot of necessary functions
 import itertools
 import os.path as op
 import warnings
+from collections.abc import Callable
 from typing import Any, Literal
 
 import matplotlib.pyplot as plt
@@ -18,6 +19,7 @@ import opt_einsum as oe
 import torch
 from matplotlib.figure import Figure
 from torch import nn
+from torch.types import Storage
 
 from . import _plot, _tensors, calculate, create_pooling_windows, pooling
 
@@ -59,7 +61,7 @@ class PoolingWindows(nn.Module):
     We can optionally cache the windows tensor we create, if
     ``cache_dir`` is not None. In that case, we'll also check to see if
     appropriate cached windows exist before creating them and load them
-    if they do. The path we'll use is
+    to specified ``cache_map_loc`` if they do. The path we'll use is
     ``{cache_dir}/scaling-{scaling}_size-{img_res}_e0-{min_eccentricity}_
     em-{max_eccentricity}_{window_type}.pt``. We'll cache each scale separately,
     changing the img_res (and potentially min_eccentricity) values in that save
@@ -90,6 +92,9 @@ class PoolingWindows(nn.Module):
         there for cached versions of the windows we create, load them if
         they exist and create and cache them if they don't. If None, we
         don't check for or cache the windows.
+    cache_map_loc
+        The desired ``map_location`` of the windows loaded by ``torch.load``
+        if :attr:`cache_dir` is set and the file(s) already exist
     window_type
         Whether to use the raised cosine function from [1]_ or a Gaussian that
         has approximately the same structure.
@@ -207,6 +212,11 @@ class PoolingWindows(nn.Module):
         max_eccentricity: float = 15,
         num_scales: int = 1,
         cache_dir: str | None = None,
+        cache_map_loc: Callable[[Storage, str], Storage]
+        | torch.device
+        | str
+        | dict[str, str]
+        | None = "cpu",
         window_type: Literal["cosine", "gaussian"] = "gaussian",
     ):
         super().__init__()
@@ -286,7 +296,11 @@ class PoolingWindows(nn.Module):
                 self.cache_paths.append(cache_path_template.format(**format_kwargs))
                 if op.exists(self.cache_paths[-1]):
                     warnings.warn(f"Loading windows from cache: {self.cache_paths[-1]}")
-                    windows = torch.load(self.cache_paths[-1])
+                    windows = torch.load(
+                        self.cache_paths[-1],
+                        map_location=cache_map_loc,
+                        weights_only=True,
+                    )
                     angle_windows = windows["angle"]
                     ecc_windows = windows["ecc"]
             if angle_windows is None or ecc_windows is None:
