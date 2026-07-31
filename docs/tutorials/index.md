@@ -7,5 +7,6 @@ Here we have provided some tutorials with downloadable notebooks showing how to 
 
 generate_windows.md
 sampling_and_aliasing.md
+compare_gaussian_cosine.md
 
 ```
