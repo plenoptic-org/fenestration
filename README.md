@@ -22,14 +22,7 @@ be found in [tutorials](https://pooling-windows.readthedocs.io/en/latest/tutoria
 
 ## Requirements
 
-This code works with python 3.10, 3.11, 3.12, 3.13, and 3.14 in order to match [PyTorch's compatibility](https://pytorch.org/get-started/locally/). To install all necessary dependencies, run `pip install .`; you
-will then be able to use the code here from within this directory.
-
-If you wish to run included tutorial notebooks, you will also need to install
-[jupyter](https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html). Additionally, some of the examples use
-[plenoptic](https://github.com/plenoptic-org/plenoptic) -- if you
-wish to use it, you must install that package as well (follow the instructions
-in its `README`).
+This code works with python 3.10, 3.11, 3.12, 3.13, and 3.14 in order to match [PyTorch's compatibility](https://pytorch.org/get-started/locally/). For installation instructions, please see the [documentation site](https://pooling-windows.readthedocs.io/en/latest/index.html).
 
 ## Usage
 
