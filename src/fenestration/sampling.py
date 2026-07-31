@@ -51,7 +51,7 @@ def check_sampling(
     interpolate to all the intermediate functions, that is, the
     functions centered on each pixel in the array.
 
-    You can either specify the spacing in pixels (:attr:`pix_sampling`) xor
+    You can either specify the spacing in pixels (:attr:`pix_sampling`) XOR
     in x values (:attr:`val_sampling`), but exactly one of them must be set.
 
     Your function can either be a torch or numpy function, but :attr:`x`
@@ -98,10 +98,14 @@ def check_sampling(
 
     Raises
     ------
+    ValueError
+        If ``x`` is not set
     Exception
         If neither :attr:`val_sampling` nor :attr:`pix_sampling` are set to ``None``
 
     """
+    if x is None:
+        raise ValueError("Argument x has not been set!")
     if val_sampling is not None:
         if pix_sampling is not None:
             raise Exception("One of val_sampling or pix_sampling must be None!")
@@ -208,10 +212,14 @@ def interpolation_plot(
 
     Raises
     ------
+    ValueError
+        If ``x`` is not set
     Exception
         If neither :attr:`val_sampling` nor :attr:`pix_sampling` are set to ``None``
 
     """
+    if x is None:
+        raise ValueError("Argument x has not been set!")
     if val is not None:
         if pix is not None:
             raise Exception("One of val_sampling or pix_sampling must be None!")
@@ -274,7 +282,14 @@ def create_movie(
     anim
         The animation object.
 
+    Raises
+    ------
+    ValueError
+        If ``x`` is not set
+
     """
+    if x is None:
+        raise ValueError("Argument x has not been set!")
     x = _tensors._to_numpy(x)
     fig = interpolation_plot(interpolated, residuals, x=x, full=full)
     if full is not None:

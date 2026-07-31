@@ -1,4 +1,4 @@
-"""Helpfer functions for calculating pooling window components.
+"""Helper functions for calculating pooling window components.
 
 These functions are primarily for performing calculations and
 unit conversions used in pooling_windows.py which contains the
@@ -106,11 +106,11 @@ def _eccentricity_window_spacing(
         equation 11 of the online methods.
     n_windows
         The number of log-eccentricity windows we create. ``n_windows``
-        or ``scaling`` must be set.
+        XOR ``scaling`` must be set.
     scaling
         The ratio of the eccentricity window's radial full-width at
         half-maximum to eccentricity (see the ``scaling``
-        function). ``n_windows`` or ``scaling`` must be set.
+        function). ``n_windows`` XOR ``scaling`` must be set.
     std_dev
         The standard deviation of the Gaussian window. If this is set,
         we compute the scaling value for the Gaussian windows instead of

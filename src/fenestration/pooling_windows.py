@@ -43,15 +43,15 @@ class PoolingWindows(nn.Module):
     larger regions.
 
     One tricky thing we do is generate a set of scaling
-    windows for each (appropriately-sized) scale. For example, the V1
-    model will have 4 scales, so for a 256 x 256 image, the coefficients
+    windows for each (appropriately-sized) scale. For example, a V1
+    model may have 4 scales, so for a 256 x 256 image, the coefficients
     will have shape (256, 256), (128, 128), (64, 64), and (32,
     32). Therefore, we need windows of the same size (could also
     up-sample the coefficient tensors, but since that would need to
     happen each iteration of the metamer synthesis, pre-generating
     appropriately sized windows is more efficient).
 
-    We will calculate the minimal eccentricity at which the area of the
+    We will calculate the minimum eccentricity at which the area of the
     windows at half-max exceeds one pixel at each scale. For scales
     beyond the first however, we will not throw an Exception if this
     value is below :attr:`min_ecc`. We instead print a warning to
@@ -180,7 +180,7 @@ class PoolingWindows(nn.Module):
 
     See Also
     --------
-    create_pooling_windows : create angle and eccentricity windows
+    create_pooling_windows : Create angle and eccentricity window tensors.
 
     Notes
     -----
@@ -558,7 +558,7 @@ class PoolingWindows(nn.Module):
         the same keys and have changed all the values to 5d tensors,
         with windows indexed along the 3rd dimension.
 
-        If it's a 4d tensor, we use the :attr:`idx` entry in the ``windows``
+        If it's a 4d tensor, we use the ``idx`` entry in the ``windows``
         list. If it's a dictionary, we assume it's keys are ``(scale,
         orientation)`` tuples and so use ``windows[key[0]]`` to find the
         appropriately-sized window (this is the case for, e.g., the
@@ -575,7 +575,7 @@ class PoolingWindows(nn.Module):
             Either a 4d tensor or a dictionary of 4d tensors.
         idx
             Which entry in the ``windows`` list to use. Only used if
-            :attr:`x` is a tensor
+            ``x`` is a tensor
         weights
             If not None, should be a tensor of shape (scales, batch, channel,
             eccentricity, angle), this allows us to reweight the pooled input
@@ -1060,7 +1060,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         Exception
-            If :attr:`im` has more than one batch or channel
+            If ``im`` has more than one batch or channel
 
         """
         if ax is None:

@@ -96,8 +96,8 @@ def gaussian(x: float | np.ndarray, std_dev: float | None = 1) -> np.ndarray:
         S &= -1 + 2 * \sum_{n=0}^{\inf} \exp(\frac{-n^2}{2})
 
     And we've stored this number as the constant ``GAUSSIAN_SUM`` (the
-    infinite sum computed in the equation above was using
-    `Wolfram Alpha <https://www.wolframalpha.com/input/?i=sum+0+to+inf+e%5E%28-n%5E2%2F2%29+>`_.
+    infinite sum computed in the equation above was computed using
+    `Wolfram Alpha <https://www.wolframalpha.com/input/?i=sum+0+to+inf+e%5E%28-n%5E2%2F2%29+>`_).
 
     When ``std_dev>1``, the windows overlap more. As with the
     probability density function of a normal distribution, we divide by
@@ -493,7 +493,7 @@ def create_pooling_windows(
 
     See Also
     --------
-    PoolingWindows : generate PoolingWindows object
+    PoolingWindows : Generic class to set up and visualize foveated pooling windows
 
     References
     ----------
