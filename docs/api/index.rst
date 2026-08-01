@@ -54,8 +54,8 @@ Sampling
 --------
 
 When creating pooling windows, it is important to ensure that any sampling does not result in aliasing,
-in which there are incorrect measurements in the reconstructed signal. These methods support interpolation
-of signals using a specified function, domain, and how to sample that domain. Furthermore, you can
+in which there are incorrect measurements in the reconstructed signal. These methods allow you to check this
+property using a specified function, domain, and how to sample that domain. Furthermore, you can
 visualize interpolation coefficients and resulting signals.
 
 .. currentmodule:: fenestration.sampling
