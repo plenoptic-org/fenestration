@@ -92,8 +92,8 @@ class PoolingWindows(nn.Module):
         there for cached versions of the windows we create, load them if
         they exist and create and cache them if they don't. If None, we
         don't check for or cache the windows.
-    cache_map_loc
-        The desired ``map_location`` of the windows loaded by ``torch.load``
+    cache_map_location
+        The desired ``map_location`` of the windows passed to ``torch.load``
         if :attr:`cache_dir` is set and the file(s) already exist
     window_type
         Whether to use the raised cosine function from [1]_ or a Gaussian that
