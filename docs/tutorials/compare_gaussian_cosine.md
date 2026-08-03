@@ -61,8 +61,8 @@ pw_gauss = fen.PoolingWindows(1, (256,256), window_type="gaussian")
 pw_cosine = fen.PoolingWindows(1, (256,256), window_type="cosine")
 
 fig, ax = plt.subplots(1, 2, figsize=(10,4))
-pw_gauss.plot_windows(ax=ax[0], subset=False)
-pw_cosine.plot_windows(ax=ax[1], subset=False)
+pw_gauss.plot_windows(ax=ax[0], subset=False);
+pw_cosine.plot_windows(ax=ax[1], subset=False);
 ```
 
 At the same scaling value, there are many more gaussian windows! Remember that scaling is the ratio of the eccentricity window's radial full-width at half-maximum (FWHM) to eccentricity. Therefore, since gaussian windows have a wider FWHM, a gaussian window must be at a larger eccentricity relative to its cosine counterpart with the same scaling and FWHM. This also means that more, smaller windows are needed to cover the space at smaller eccentricities.
@@ -141,8 +141,8 @@ Although these windows are approximately matched based on widths, the number and
 
 ```{code-cell} ipython3
 fig, ax = plt.subplots(1, 2, figsize=(10,4))
-pw_gauss.plot_windows(ax=ax[0], subset=False)
-pw_cosine.plot_windows(ax=ax[1], subset=False)
+pw_gauss.plot_windows(ax=ax[0], subset=False);
+pw_cosine.plot_windows(ax=ax[1], subset=False);
 ```
 
 However, despite gaussian windows overlapping more, leading to smoother representations, the use of the models and scientific inferences made by [Freeman & Simoncelli, 2011](https://www.nature.com/articles/nn.2889) and [Broderick et al., 2023](https://elifesciences.org/reviewed-preprints/90554#tab-content) do not rely on the exact specifications of the windows. In this package, gaussian windows are the default, but you can try them both out yourself!
