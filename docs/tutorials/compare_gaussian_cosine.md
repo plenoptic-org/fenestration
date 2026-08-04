@@ -30,7 +30,6 @@ Download the executed notebook: **{nb-download}`compare_gaussian_cosine.ipynb`**
 
 ```
 
-(comparing-window-types)=
 # Comparing Window Types
 
 In this package, we support two different window types: raised cosine (used for the original implementation in [Freeman and Simoncelli, 2011](https://www.nature.com/articles/nn.2889)) and gaussian (used for a more recent implementation in [Broderick, Rufo, Winawer, & Simoncelli, 2023](https://elifesciences.org/reviewed-preprints/90554)). The gaussian windows generally support a smoother representation and minimal ringing and blocking artifacts in metamer synthesis, but we will compare the two window types here. First, let's see what these functions actually look like, using our built-in functions {meth}`~fenestration.pooling.raised_cosine` and {meth}`~fenestration.pooling.gaussian`.
