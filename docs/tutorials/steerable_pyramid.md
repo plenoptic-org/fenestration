@@ -62,7 +62,7 @@ po.plot.imshow(img);
 
 ## Creating the Steerable Pyramid
 
-Now we will use the SteerablePyramidFreq process to create the pyramid and extract the coefficients. The parameter `height` refers to the height of the pyramid, which should be the same as the number of `scales` we create with `PoolingWindows`. Here we see that `pyr_coeffs` is a dictionary with keys 0-3, corresponding to `height=4` in addition to `residual_lowpass` and `residual_highpass`. The shape of each of the dictionary elements now has an additional dimension corresponding to each of the four orientations.
+Now we will use the SteerablePyramidFreq process to create the pyramid and extract the coefficients. The parameter `height` refers to the height of the pyramid, which should be the same as the number of `scales` we create with {meth}`~fenestration.PoolingWindows`. Here we see that `pyr_coeffs` is a dictionary with keys 0-3, corresponding to `height=4` in addition to `residual_lowpass` and `residual_highpass`. The shape of each of the dictionary elements now has an additional dimension corresponding to each of the four orientations.
 
 ```{code-cell} ipython3
 # create the pyramid
@@ -101,7 +101,7 @@ print(pyr_coeffs[0].shape)
 print(pyr_coeffs[1].shape)
 ```
 
-The input to PoolingWindow's `forward` method must be a dictionary of 4d tensors (or a single 4d tensor) in which the keys are `(scale, orientation)` tuples. Therefore, we remove `residual_highpass` and `residual_lowpass` and rearrange these values into a new dictionary `new_pyr`.
+Now we can pass the pyramid coefficients into {meth}`~fenestration.PoolingWindows` in order to get the pooled windows at each scale and orientation. However, the input to PoolingWindow's {meth}`~fenestration.PoolingWindows.forward` method must be a dictionary of 4d tensors (or a single 4d tensor) in which the keys are `(scale, orientation)` tuples. Therefore, we remove `residual_highpass` and `residual_lowpass` and rearrange these values into a new dictionary `new_pyr`.
 
 ```{code-cell} ipython3
 for k in ['residual_highpass', 'residual_lowpass']:
@@ -114,7 +114,7 @@ for k, v in pyr_coeffs.items():
 print(new_pyr.keys())
 ```
 
-We can now instantiate our `PoolingWindows` object (remember to use 4 scales!) and pass it our new dictionary. The `pooled_coeffs` will have the same keys as our input dictionary and its values will be pooled versions of the corresponding coefficients. Note the warnings about some windows being too small.
+We can now instantiate our {meth}`~fenestration.PoolingWindows` object (remember to use 4 scales!) and pass it our new dictionary. The `pooled_coeffs` will have the same keys as our input dictionary and its values will be pooled versions of the corresponding coefficients. Note the warnings about some windows being too small.
 
 ```{code-cell} ipython3
 pw = fen.PoolingWindows(0.5, img.shape[-2:], num_scales=4)
@@ -123,7 +123,7 @@ for k, v in pooled_coeffs.items():
     print(f'scale {k[0]}, orientation band {k[1]}: {v.shape}')
 ```
 
-Finally, we can use the `project` method of `PoolingWindows` to project the pooled values back onto an image. Here we can visualize these projections at each scale (rows) and orientation (columns).
+Finally, we can use the {meth}`~fenestration.PoolingWindows.project` method of {meth}`~fenestration.PoolingWindows` to project the pooled values back onto an image. Here we can visualize these projections at each scale (rows) and orientation (columns).
 
 ```{code-cell} ipython3
 mpl.rcParams['xtick.bottom'] = False
