@@ -53,7 +53,7 @@ import plenoptic as po
 ```
 
 ```{code-cell} ipython3
-img = torch.from_numpy(plt.imread('../_static/images/parrot.png').astype(np.float32)) / 255
+img = torch.from_numpy(plt.imread('../_static/images/curie.pgm').astype(np.float32)) / 255
 while img.ndim < 4:
     img = img.unsqueeze(0)
 print(img.shape)
@@ -62,34 +62,7 @@ po.plot.imshow(img);
 
 ## Creating the Steerable Pyramid
 
-Now we will use the SteerablePyramidFreq process to create the pyramid and extract the coefficients. The parameter `height` refers to the height of the pyramid, which should be the same as the number of `scales` we create with {meth}`~fenestration.PoolingWindows`. Here we see that `pyr_coeffs` is a dictionary with keys 0-3, corresponding to `height=4` in addition to `residual_lowpass` and `residual_highpass`. The shape of each of the dictionary elements now has an additional dimension corresponding to each of the four orientations.
-
-```{code-cell} ipython3
-# create the pyramid
-pyr = po.process.SteerablePyramidFreq(img.shape[-2:], height=4, downsample=False)
-# get the pyramid coefficients; this is equivalent to pyr.forward(img)
-pyr_coeffs = pyr(img)
-print(pyr_coeffs.keys())
-print(pyr_coeffs[0].shape)
-```
-
-We can manipulate these coefficient outputs to display each of the image filters.
-
-```{code-cell} ipython3
-# convert coeffs to tensor
-coeffs_tensor, _ = pyr.convert_pyr_to_tensor(pyr_coeffs)
-# rearrange so that the residuals are at the end
-coeffs_tensor = [
-    coeffs_tensor[:, 1:-1],
-    coeffs_tensor[:, :1],
-    coeffs_tensor[:, -1:],
-]
-po.plot.imshow(coeffs_tensor, col_wrap=pyr.num_orientations);
-```
-
-## Applying PoolingWindows to Steerable Pyramid
-
-In the previous example, we set the argument `downsample=False` in `SteerablePyramidFreq` so all coefficients would be the same size for easier visualization. However, when calculating the pooled coefficients at each scale, we want to use the default downsampling. Here we see that as we increase the height, the image size decreases.
+Now we will use the `SteerablePyramidFreq` process to create the pyramid and extract the coefficients. The parameter `height` refers to the height of the pyramid, which should be the same as the number of `scales` we create with {meth}`~fenestration.PoolingWindows`. Here we see that `pyr_coeffs` is a dictionary with keys 0-3, corresponding to `height=4` in addition to `residual_lowpass` and `residual_highpass`. The shape of each of the dictionary elements now has an additional dimension corresponding to each of the four orientations.
 
 ```{code-cell} ipython3
 # create the pyramid
@@ -98,8 +71,15 @@ pyr = po.process.SteerablePyramidFreq(img.shape[-2:], height=4)
 pyr_coeffs = pyr(img)
 print(pyr_coeffs.keys())
 print(pyr_coeffs[0].shape)
-print(pyr_coeffs[1].shape)
 ```
+
+We can visualize these coefficient outputs using the built-in function `po.plot.pyrshow`.
+
+```{code-cell} ipython3
+po.plot.pyrshow(pyr_coeffs);
+```
+
+## Applying PoolingWindows to Steerable Pyramid
 
 Now we can pass the pyramid coefficients into {meth}`~fenestration.PoolingWindows` in order to get the pooled windows at each scale and orientation. However, the input to PoolingWindow's {meth}`~fenestration.PoolingWindows.forward` method must be a dictionary of 4d tensors (or a single 4d tensor) in which the keys are `(scale, orientation)` tuples. Therefore, we remove `residual_highpass` and `residual_lowpass` and rearrange these values into a new dictionary `new_pyr`.
 
@@ -114,7 +94,7 @@ for k, v in pyr_coeffs.items():
 print(new_pyr.keys())
 ```
 
-We can now instantiate our {meth}`~fenestration.PoolingWindows` object (remember to use 4 scales!) and pass it our new dictionary. The `pooled_coeffs` will have the same keys as our input dictionary and its values will be pooled versions of the corresponding coefficients. Note the warnings about some windows being too small.
+We can now instantiate our {meth}`~fenestration.PoolingWindows` object (remember to use 4 scales!) and pass it our new dictionary. The `pooled_coeffs` will have the same keys as our input dictionary and its values will be pooled versions of the corresponding coefficients with the 3rd dimension corresponding to each window. Note the warnings about some windows being too small!
 
 ```{code-cell} ipython3
 pw = fen.PoolingWindows(0.5, img.shape[-2:], num_scales=4)
