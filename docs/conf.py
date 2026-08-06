@@ -65,3 +65,6 @@ html_css_files = ["custom.css"]
 
 # Enable automatic stub page generation
 autosummary_generate = True
+
+# max time (in secs) per notebook cell. here, we disable this
+nb_execution_timeout = -1

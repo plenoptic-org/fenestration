@@ -32,7 +32,10 @@ Download the executed notebook: **{nb-download}`metamer_synthesis.ipynb`**!
 
 # Synthesizing Metamers
 
+Here we provide a tutorial for using {class}`~fenestration.PoolingWindows` to create image metamers with [plenoptic](https://plenoptic.org/). By "metamers", we refer to images that are physcially different but have an identical representation for a given model. We will walk through examples of different models and how we can change {class}`~fenestration.PoolingWindows` features to generate different metamers.
+
 ```{code-cell} ipython3
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import torch
 
@@ -51,8 +54,9 @@ plt.rcParams["animation.ffmpeg_args"] = ["-threads", "1"]
 %autoreload 2
 ```
 
-
 ## Loading in images
+
+We begin by using plenoptic's [data](https://docs.plenoptic.org/docs/tags/2.1.0/api/images.html) and [plotting](https://docs.plenoptic.org/docs/tags/2.1.0/api/plot.html) functions to grab two images. Since these images are very different in terms of spatial frequency and structure, it will help us visualize the resulting metamers.
 
 ```{code-cell} ipython3
 reptile = po.data.reptile_skin()
@@ -61,34 +65,84 @@ imgs = torch.cat([reptile, einstein])
 po.plot.imshow(imgs);
 ```
 
-## Synthesizing image metamers
+## Visualizing Pooled Windows
+
+To generate metamers, we first have to define a model which takes in a 4d tensor and performs some computation on the input. The metamer synthesis step starts from a noisy image and tries to minimize the error between the model output of the original image and that of the synthesized image. With this model example, the process will try to minimize error between the pooled values of all windows for the original and synthesized images.
+
+Here, we define pooling windows with `scaling=0.5`. In the left figures, we have overlaid a wedge of pooling windows on the original images to visualize the extent that each pooling window is averaging across. In the right figures, we use the {meth}`~fenestration.PoolingWindows.plot_window_values` method to displayed the pooled image values in each window that we will matching the metamer values to. You can see that the smaller, more central windows maintain information more similar to the original image, while the more eccentric windows have a more blurred representation.
 
 ```{code-cell} ipython3
 model = fen.PoolingWindows(0.5,reptile.shape[-2:])
+
+fig, axes = plt.subplots(2, 2, figsize=(8,8), layout="tight")
+po.plot.imshow(imgs, batch_idx=0, ax=axes[0,0], title=None)
+model.plot_windows(ax=axes[0,0])
+model.plot_window_values(reptile, ax=axes[0,1], subset=False)
+axes[0,1].invert_yaxis()
+po.plot.imshow(imgs, batch_idx=1, ax=axes[1,0], title=None)
+model.plot_windows(ax=axes[1,0])
+model.plot_window_values(einstein, ax=axes[1,1], subset=False)
+axes[1,1].invert_yaxis()
+```
+
+## Synthesizing image metamers
+
+Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model works, let's get to synthesizing some metamers. Here we set our model to evaluation model, remove gradients from its parameters, initialize the metamer object, and run synthesis.
+
+```{code-cell} ipython3
 model.eval()
 po.remove_grad(model)
 met = po.Metamer(imgs, model)
 met.synthesize(store_progress=True, max_iter=200);
 ```
 
+We see that the loss has converged, great! Let's check out our metamers and plot the loss and error across each iteration. Since the model only cares about the average pixel values in each window, the metamer will also maintain the corresponding average pixel values in each window region, but does not "see" the noise in the generated image. Also note how the correspondence to the original image changes based on eccentricity due to the increasing window sizes.
+
 ```{code-cell} ipython3
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
 po.plot.imshow(imgs, batch_idx=0, ax=axes[0], title="target image")
-model.plot_windows(ax=axes[0])
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
 po.plot.synthesis_status(met, batch_idx = 0, fig=fig, axes_idx={"misc": 0});
 
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
 po.plot.imshow(imgs, batch_idx=1, ax=axes[0], title="target image")
-model.plot_windows(ax=axes[0])
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
 po.plot.synthesis_status(met, batch_idx = 1, fig=fig, axes_idx={"misc": 0});
 ```
+
+## Changing Scaling Values
+
+Now let's see how the scaling value impacts our metamers. Here we decrease `scaling` in half and again visualize the pooling windows.
 
 ```{code-cell} ipython3
 model = fen.PoolingWindows(0.25,reptile.shape[-2:])
+
+fig, axes = plt.subplots(2, 2, figsize=(8,8), layout="tight")
+po.plot.imshow(imgs, batch_idx=0, ax=axes[0,0], title=None)
+model.plot_windows(ax=axes[0,0])
+model.plot_window_values(reptile, ax=axes[0,1], subset=False)
+axes[0,1].invert_yaxis()
+po.plot.imshow(imgs, batch_idx=1, ax=axes[1,0], title=None)
+model.plot_windows(ax=axes[1,0])
+model.plot_window_values(einstein, ax=axes[1,1], subset=False)
+axes[1,1].invert_yaxis()
+```
+
+Also note the warning that we get now about some windows being smaller than a pixel! If the scaling value is small, it's possible for the smallest windows to be smaller than a pixel and not included in the windows, similar to the central region below `min_ecc`. You can access the minimum eccentricity for avoiding this issue with the attribute `self.calculated_min_eccentricity_degrees`. We can zoom in and see the small windows here:
+
+```{code-cell} ipython3
+fig = po.plot.imshow(imgs, batch_idx=0, title=None)
+model.plot_windows(ax=fig.axes[0]);
+plt.xlim(128,180);
+plt.ylim(102,152);
+plt.gca().invert_yaxis()
+```
+
+Despite this, we can still generate our metamer! Since we are using smaller windows, we can see finer-grained details of the original image across a wider range of the metamer.
+
+```{code-cell} ipython3
 model.eval()
 po.remove_grad(model)
 met = po.Metamer(imgs, model)
@@ -96,40 +150,24 @@ met.synthesize(store_progress=True, max_iter=200);
 
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
 po.plot.imshow(imgs, batch_idx=0, ax=axes[0], title="target image")
-model.plot_windows(ax=axes[0])
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
 po.plot.synthesis_status(met, batch_idx = 0, fig=fig, axes_idx={"misc": 0});
 
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
 po.plot.imshow(imgs, batch_idx=1, ax=axes[0], title="target image")
-model.plot_windows(ax=axes[0])
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
 po.plot.synthesis_status(met, batch_idx = 1, fig=fig, axes_idx={"misc": 0});
 ```
 
-```{code-cell} ipython3
-fig = po.plot.imshow(imgs, batch_idx=0, title="target image")
-model.plot_windows(ax=fig.axes[0]);
-plt.xlim(128,200);
-plt.ylim(92,162);
-```
+## Comparing Window Types
 
-## Comparing gaussian and cosine window synthesis
+Although we have been using gaussian windows for the synthesis thus far, `fenestration` also supports raised-cosine windows. Using `scaling=0.5`, we will generate metamers using each window type. First, let's visualize the differences in size and shape of each window type for the same scaling value on the Einstein image. See Comparing Window Types tutorial for additonal information comparing gaussian and cosine windows.
 
 ```{code-cell} ipython3
-model_gauss = fen.PoolingWindows(0.25, einstein.shape[-2:], window_type="gaussian")
-model_gauss.eval()
-po.remove_grad(model_gauss)
-met_gauss = po.Metamer(einstein, model_gauss)
-met_gauss.synthesize(store_progress=True, max_iter=200);
-
-model_cosine = fen.PoolingWindows(0.25, einstein.shape[-2:], window_type="cosine")
-model_cosine.eval()
-po.remove_grad(model_cosine)
-met_cosine = po.Metamer(einstein, model_cosine)
-met_cosine.synthesize(store_progress=True, max_iter=200);
+model_gauss = fen.PoolingWindows(0.5, einstein.shape[-2:], window_type="gaussian")
+model_cosine = fen.PoolingWindows(0.5, einstein.shape[-2:], window_type="cosine")
 
 fig, axes = plt.subplots(1, 2, figsize=(8,4), layout="tight")
 po.plot.imshow(einstein, ax=axes[0], title="target image")
@@ -143,7 +181,21 @@ axes[1].xaxis.set_visible(False)
 axes[1].yaxis.set_visible(False)
 ```
 
+Now let's perform the synthesis for each model. Here we can clearly see the benefit of using the smoother gaussian windows (top row) which generates metamers that eliminate the sharper boundaries and ringing effect present from the cosine windows (bottom row).
+
 ```{code-cell} ipython3
+model_gauss.eval()
+po.remove_grad(model_gauss)
+met_gauss = po.Metamer(einstein, model_gauss)
+met_gauss.synthesize(store_progress=True, max_iter=200);
+
+model_cosine.eval()
+po.remove_grad(model_cosine)
+met_cosine = po.Metamer(einstein, model_cosine)
+met_cosine.synthesize(store_progress=True, max_iter=200);
+
 po.plot.synthesis_status(met_gauss);
 po.plot.synthesis_status(met_cosine);
 ```
+
+These are just a few examples of how `fenestration` can interact with plenoptic's metamer synthesis, but there are many more ways these can be used! Feel free to play around with other {class}`~fenestration.PoolingWindows` parameters, other [synthesis methods](https://docs.plenoptic.org/docs/tags/2.1.0/api/synthesis.html) from plenoptic, or combining {class}`~fenestration.PoolingWindows` with other image processing methods, like steerable pyramids.
