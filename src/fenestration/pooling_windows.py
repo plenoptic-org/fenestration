@@ -182,6 +182,10 @@ class PoolingWindows(nn.Module):
     ------
     ValueError
         If :attr:`img_res` is not 2d
+    ValueError
+        If :attr:`window_type` is not "gaussian" or "cosine
+    FileNotFoundError
+        If :attr:`cache_dir` is specified but does not exist
 
     See Also
     --------
