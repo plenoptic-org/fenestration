@@ -39,6 +39,12 @@ Download the executed notebook: **{nb-download}`generate_windows.ipynb`**!
 (generate-windows-nb)=
 # Generate Windows
 
+```{admonition} Warning
+:class: warning
+
+This notebook requires the optional dependency `plenoptic`, which can be installed with `pip`.
+```
+
 This notebook provides tutorials on the most common ways of initializing and interacting with {class}`~fenestration.PoolingWindows`, which constructs foveated windows and uses them to take weighted averages across an image.
 
 ```{code-cell} ipython3
@@ -48,6 +54,7 @@ import numpy as np
 import torch
 
 import fenestration as fen
+import plenoptic as po
 
 mpl.rcParams['xtick.bottom'] = False
 mpl.rcParams['xtick.labelbottom'] = False
@@ -127,11 +134,10 @@ scaling_10win = fen.calculate.scaling(n_windows=10, min_ecc=1, max_ecc=10, std_d
 pw_5win = fen.PoolingWindows(scaling_5win, (256,256), min_eccentricity=1, max_eccentricity=10)
 pw_10win = fen.PoolingWindows(scaling_10win, (256,256), min_eccentricity=1, max_eccentricity=10)
 
-fig, ax = plt.subplots(1, 2, figsize=(8,4))
-pw_5win.plot_windows(ax=ax[0],subset=False)
-ax[0].set_title(f"Scaling = {scaling_5win:.4f}");
-pw_10win.plot_windows(ax=ax[1],subset=False)
-ax[1].set_title(f"Scaling = {scaling_10win:.4f}");
+ax = pw_5win.plot_windows(subset=False);
+ax.set_title(f"Scaling = {scaling_5win:.4f}");
+ax = pw_10win.plot_windows(subset=False);
+ax.set_title(f"Scaling = {scaling_10win:.4f}");
 ```
 
 ## Visualizing `PoolingWindows`
@@ -142,8 +148,6 @@ ax[1].set_title(f"Scaling = {scaling_10win:.4f}");
 If you want to just generate the eccentricity rings and angular wedges separately, you can also call {func}`~fenestration.create_pooling_windows`. Here we will use `scaling=2` and and image size of `(256,256)`. We will also take advantage of [plenoptic's](https://plenoptic.org/) plotting function `po.plot.imshow`.
 
 ```{code-cell} ipython3
-import plenoptic as po
-
 angle_w, ecc_w = fen.create_pooling_windows(2, (256, 256))
 # only show first 8 eccentricity rings
 fig = po.plot.imshow(ecc_w[:8].unsqueeze(0))
@@ -154,7 +158,10 @@ It is also possible to reconstruct the full windows from the separate angle and 
 
 ```{code-cell} ipython3
 windows = torch.einsum('ahw,ehw->eahw', [angle_w, ecc_w]).flatten(0, 1)
-plt.imshow(windows[0,:,:], cmap="gray");
+win = windows[0,:,:]
+while win.ndim < 4:
+    win = win.unsqueeze(0)
+po.plot.imshow(win, cmap="gray");
 ```
 
 ### Visualizing Window Contours
@@ -171,7 +178,7 @@ Now let's generate a figure with a noisy gradient across the image. We can then 
 
 ```{code-cell} ipython3
 img = torch.rand((1, 1, 256, 256), dtype=torch.float32) * torch.range(1/256,1,1/256)
-plt.imshow(torch.squeeze(img), cmap="gray");
+po.plot.imshow(img, cmap="gray");
 ```
 
 Since we are "pooling" the input within each window, we now see a smooth gradient across the windows returned after averaging out the noise.
