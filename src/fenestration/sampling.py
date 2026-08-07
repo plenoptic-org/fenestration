@@ -100,7 +100,7 @@ def check_sampling(
     ------
     ValueError
         If ``x`` is not set
-    Exception
+    ValueError
         If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
 
     """
@@ -108,7 +108,7 @@ def check_sampling(
         raise ValueError("Argument x has not been set!")
     if val_sampling is not None:
         if pix_sampling is not None:
-            raise Exception("One of val_sampling or pix_sampling must be None!")
+            raise ValueError("One of val_sampling or pix_sampling must be None!")
         # this will get us the closest value, if there's no exactly
         # correct one.
         pix_sampling = np.argmin(abs((x + val_sampling)[0] - x))
@@ -214,7 +214,7 @@ def interpolation_plot(
     ------
     ValueError
         If ``x`` is not set
-    Exception
+    ValueError
         If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
 
     """
@@ -222,7 +222,7 @@ def interpolation_plot(
         raise ValueError("Argument x has not been set!")
     if val is not None:
         if pix is not None:
-            raise Exception("One of val_sampling or pix_sampling must be None!")
+            raise ValueError("One of val_sampling or pix_sampling must be None!")
         # this will get us the closest value, if there's no exactly
         # correct one.
         pix = np.argmin(abs(x - val))

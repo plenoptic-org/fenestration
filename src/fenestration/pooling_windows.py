@@ -178,6 +178,11 @@ class PoolingWindows(nn.Module):
         hard-coded at 1, therefore it's half a standard deviation away from
         the center, approximately 0.14.
 
+    Raises
+    ------
+    ValueError
+        If :attr:`img_res` is not 2d
+
     See Also
     --------
     create_pooling_windows : Create angle and eccentricity window tensors.
@@ -187,7 +192,7 @@ class PoolingWindows(nn.Module):
     We will calculate the minimum eccentricity at which the
     area of the windows at half-max exceeds one pixel (based on
     :attr:`scaling`, :attr:`img_res` and :attr:`max_ecc`) and, if
-    :attr:`min_ecc` is below that, will throw an Exception.
+    :attr:`min_ecc` is below that, will print a warning.
 
     If you are just interested in the eccentricity and angular filters
     associated with these pooling windows, this is also possible using
@@ -215,7 +220,7 @@ class PoolingWindows(nn.Module):
     ):
         super().__init__()
         if len(img_res) != 2:
-            raise Exception("img_res must be 2d!")
+            raise ValueError("img_res must be 2d!")
         self.scaling = scaling
         self.min_ecc = float(min_ecc)
         self.max_ecc = float(max_ecc)
@@ -657,8 +662,8 @@ class PoolingWindows(nn.Module):
 
         Raises
         ------
-        Exception
-            If input tensor does not have 4 dimensions
+        ValueError
+            If ``x`` is not 4d tensor or dictionary of 4d tensors
 
         See Also
         --------
@@ -668,7 +673,7 @@ class PoolingWindows(nn.Module):
         """
         if isinstance(x, dict):
             if list(x.values())[0].ndimension() != 4:
-                raise Exception(
+                raise ValueError(
                     "PoolingWindows input must be 4d tensors or a dict of 4d tensors!"
                     " Unsqueeze until this is true!"
                 )
@@ -690,7 +695,7 @@ class PoolingWindows(nn.Module):
             )
         else:
             if x.ndimension() != 4:
-                raise Exception(
+                raise ValueError(
                     "PoolingWindows input must be 4d tensors or a dict of 4d tensors!"
                     " Unsqueeze until this is true!"
                 )
@@ -787,8 +792,8 @@ class PoolingWindows(nn.Module):
 
         Raises
         ------
-        Exception
-            If tensor input is not 3 dimensions
+        ValueError
+            If ``pooled_x`` is not 3d tensor or dictionary of 3d tensors
 
         See Also
         --------
@@ -798,7 +803,7 @@ class PoolingWindows(nn.Module):
         """
         if isinstance(pooled_x, dict):
             if list(pooled_x.values())[0].ndimension() != 3:
-                raise Exception(
+                raise ValueError(
                     "PoolingWindows input must be 3d tensors or a dict of 3d tensors!"
                     " Squeeze until this is true!"
                 )
@@ -825,7 +830,7 @@ class PoolingWindows(nn.Module):
             return tmp
         else:
             if pooled_x.ndimension() != 3:
-                raise Exception(
+                raise ValueError(
                     "PoolingWindows input must be 3d tensors or a dict of 3d tensors!"
                     " Squeeze until this is true!"
                 )
@@ -1059,7 +1064,7 @@ class PoolingWindows(nn.Module):
 
         Raises
         ------
-        Exception
+        ValueError
             If ``im`` has more than one batch or channel
 
         """
@@ -1073,7 +1078,7 @@ class PoolingWindows(nn.Module):
         if im is not None:
             im = im.squeeze()
             if im.ndim > 2:
-                raise Exception("im can only have one batch and channel!")
+                raise ValueError("im can only have one batch and channel!")
         if subset:
             angle_windows = angle_windows[:4]
         for a in angle_windows:
@@ -1163,7 +1168,7 @@ class PoolingWindows(nn.Module):
 
         Raises
         ------
-        Exception
+        ValueError
             If ``units`` are not 'pixels' or 'degrees'
 
         """
@@ -1174,7 +1179,9 @@ class PoolingWindows(nn.Module):
             data = self.window_width_pixels[scale_num]
             central_ecc = self.central_eccentricity_pixels[scale_num]
         else:
-            raise Exception(f"units must be one of {'pixels', 'degrees'}, not {units}!")
+            raise ValueError(
+                f"units must be one of {'pixels', 'degrees'}, not {units}!"
+            )
         if ax is None:
             fig, ax = plt.subplots(1, 1, figsize=figsize)
         else:
@@ -1251,7 +1258,7 @@ class PoolingWindows(nn.Module):
 
         Raises
         ------
-        Exception
+        ValueError
             If ``units`` are not 'pixels' or 'degrees'
 
         """
@@ -1262,7 +1269,9 @@ class PoolingWindows(nn.Module):
             data = self.window_approx_area_pixels[scale_num]
             central_ecc = self.central_eccentricity_pixels[scale_num]
         else:
-            raise Exception(f"units must be one of {'pixels', 'degrees'}, not {units}!")
+            raise ValueError(
+                f"units must be one of {'pixels', 'degrees'}, not {units}!"
+            )
         if ax is None:
             fig, ax = plt.subplots(1, 1, figsize=figsize)
         else:
