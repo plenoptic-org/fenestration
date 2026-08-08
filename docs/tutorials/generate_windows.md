@@ -56,11 +56,6 @@ import torch
 import fenestration as fen
 import plenoptic as po
 
-mpl.rcParams['xtick.bottom'] = False
-mpl.rcParams['xtick.labelbottom'] = False
-mpl.rcParams['ytick.left'] = False
-mpl.rcParams['ytick.labelleft'] = False
-
 %load_ext autoreload
 %autoreload 2
 %matplotlib inline
@@ -199,11 +194,6 @@ We also have a few additional helper functions for understanding the windows, in
 The window widths figure depicts two measurements: width of the windows along the radial (long) axis and angular (short) axis. Each individual window's size is defined by three measurements: 'top', 'half', and 'full' widths. Top is the width of the flat-top region of each window where the window's value is 1 (only present for cosine windows); full is the width of the entire window; half is the width at the half-max value. To get the approximate area, we multiply the radial width against the corresponding angular width, then divide by {math}`\frac{\pi}{4}`.
 
 ```{code-cell} ipython3
-mpl.rcParams['xtick.bottom'] = True
-mpl.rcParams['xtick.labelbottom'] = True
-mpl.rcParams['ytick.left'] = True
-mpl.rcParams['ytick.labelleft'] = True
-
 fig, ax = plt.subplots(1,2, figsize=(10, 4))
 pw.plot_window_widths(ax=ax[0]);
 pw.plot_window_areas(ax=ax[1]);
