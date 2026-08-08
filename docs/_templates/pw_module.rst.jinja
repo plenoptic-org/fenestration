@@ -15,19 +15,8 @@
    .. rubric:: {{ _('Methods') }}
 
    .. autosummary::
-      to
-      merge
-      forward
-      window
-      pool
-      project
-      save
-      load
-      plot_windows
-      plot_window_values
-      plot_window_widths
-      plot_window_areas
-      plot_window_checks
-      summarize_window_sizes
+   {% for item in attributes %}
+      ~{{ name }}.{{ item }}
+   {%- endfor %}
    {% endif %}
    {% endblock %}

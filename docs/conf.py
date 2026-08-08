@@ -58,7 +58,7 @@ napoleon_use_rtype = False
 autodoc_default_options = {
     "members": True,
     "show-inheritance": False,
-    "member-order": "bysource",
+    "member-order": "groupwise",
 }
 
 # -- Options for HTML output -------------------------------------------------
