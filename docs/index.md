@@ -48,7 +48,7 @@ This code works with the python versions currently supported by [PyTorch](https:
 ## Related packages
 
 - [plenoptic](https://docs.plenoptic.org/docs/tags/2.1.0/index.html): This package is largely built to be compatible with plenoptic, particularly for metamer generation and for steerable pyramids. We recommend you check out plenoptic for many other stimulus processing tools!
-- [pytorch](https://pytorch.org): Optimized tensor library for deep learning using GPUs and CPUs. We require many stimulus inputs to `fenestration` to be pytorch tensors in order to support GPU and CPU processing.
+- [pytorch](https://pytorch.org): Optimized tensor library for deep learning using GPUs and CPUs. We require stimulus inputs to `fenestration` to be pytorch tensors in order to support GPU and CPU processing.
 
 ## Support
 

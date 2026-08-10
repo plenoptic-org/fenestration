@@ -16,10 +16,13 @@ jobs:
         persist-credentials: false
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 #v6.2.0
     - run: |
+        recent_version=$(pip index versions torch | grep -oE "torch \([0-9\.]*?" | sed 's/torch (//g')
+        echo "Downloading toml from https://raw.githubusercontent.com/pytorch/pytorch/refs/tags/v${recent_version}/pyproject.toml"
+        curl https://raw.githubusercontent.com/pytorch/pytorch/refs/tags/v${recent_version}/pyproject.toml > pytorch.toml
         pytorch_version=$(python .github/workflows/check_supported_versions.py pytorch.toml)
         fenestration_version=$(python .github/workflows/check_supported_versions.py pyproject.toml)
         if [[ $pytorch_version != $fenestration_version ]]; then
-            echo "PYTORCH SUPPORTED PYTHON VERSIONS CHANGED, update pyproject.toml";
+            echo "PYTORCH SUPPORTED PYTHON VERSIONS CHANGED, update pyproject.toml, README/index badges, and ci.yml";
             echo pytorch: $pytorch_version";
             echo fenestration: $fenestration_version";
             exit 1;
