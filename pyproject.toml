@@ -4,6 +4,17 @@ dynamic = ["version"]
 description = "PyTorch implementation of pooling windows like those used in Freeman and Simoncelli, 2011."
 readme = "README.md"
 requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+]
 
 dependencies = [
     "numpy>=1.1",

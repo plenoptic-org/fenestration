@@ -133,7 +133,7 @@ def raised_cosine(
 
     Raises
     ------
-    Exception
+    ValueError
         If ``transition_region_width`` is not between 0 and 1
 
     Notes
@@ -149,7 +149,7 @@ def raised_cosine(
 
     """
     if transition_region_width > 1 or transition_region_width < 0:
-        raise Exception("transition_region_width must lie between 0 and 1!")
+        raise ValueError("transition_region_width must lie between 0 and 1!")
     # doing it in this array-ized fashion is much faster
     y = torch.zeros_like(x)
     # this creates a bunch of masks
@@ -233,9 +233,11 @@ def _polar_angle_windows(
 
     Raises
     ------
-    Exception
+    TypeError
         If ``n_windows`` is not an integer
-    Exception
+    ValueError
+        If ``n_windows=1``
+    ValueError
         If ``n_windows`` is not greater than 8*``std_dev``
 
     Notes
@@ -250,14 +252,14 @@ def _polar_angle_windows(
 
     """
     if int(n_windows) != n_windows:
-        raise Exception("n_windows must be an integer!")
+        raise TypeError("n_windows must be an integer!")
     if n_windows == 1:
-        raise Exception("We cannot handle one window correctly!")
+        raise ValueError("We cannot handle one window correctly!")
     # this is `w_\theta` in the paper
     window_spacing = calculate._angular_window_spacing(n_windows)
     max_angle = 2 * np.pi - window_spacing
     if window_type == "gaussian" and (std_dev * 8) > n_windows:
-        raise Exception(
+        raise ValueError(
             f"In order for windows to tile the circle correctly, n_windows ({n_windows}"
             f") must be greater than 8*std_dev ({8 * std_dev})!"
         )
