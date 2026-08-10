@@ -183,7 +183,7 @@ class PoolingWindows(nn.Module):
     ValueError
         If :attr:`img_res` is not 2d
     ValueError
-        If :attr:`window_type` is not "gaussian" or "cosine
+        If :attr:`window_type` is not "gaussian" or "cosine"
     FileNotFoundError
         If :attr:`cache_dir` is specified but does not exist
 
@@ -1184,7 +1184,7 @@ class PoolingWindows(nn.Module):
             central_ecc = self.central_eccentricity_pixels[scale_num]
         else:
             raise ValueError(
-                f"units must be one of {'pixels', 'degrees'}, not {units}!"
+                f"units must be one of ['pixels', 'degrees'], not {units}!"
             )
         if ax is None:
             fig, ax = plt.subplots(1, 1, figsize=figsize)
@@ -1274,7 +1274,7 @@ class PoolingWindows(nn.Module):
             central_ecc = self.central_eccentricity_pixels[scale_num]
         else:
             raise ValueError(
-                f"units must be one of {'pixels', 'degrees'}, not {units}!"
+                f"units must be one of ['pixels', 'degrees'], not {units}!"
             )
         if ax is None:
             fig, ax = plt.subplots(1, 1, figsize=figsize)
