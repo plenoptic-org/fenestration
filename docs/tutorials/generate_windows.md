@@ -66,7 +66,7 @@ import plenoptic as po
 Let's begin by creating a {class}`~fenestration.PoolingWindows` object for image size `(256,256)` and visualize the window contours that are created. Beyond the size of the image, the only required argument is `scaling`, which is defined as the ratio between a window's radial full-width at half-maximum and its central eccentricity and thus controls the window size (see [](choosing-scaling-values) for more details).
 
 We can also change a number of other optional parameters:
-- `min_eccentricity` and `max_eccentricity` define the extent of the windows within the image to support conversion between pixels and degrees of visual angle. We do not place windows in the foveal region within the `min_eccentricity` ring.
+- `min_ecc` and `max_ecc` define the extent of the windows within the image to support conversion between pixels and degrees of visual angle. We do not place windows in the foveal region within the `min_ecc` ring.
 - `num_scales` which controls the number of window scales generated.
 - `cache_dir` for specifying a directory to cache the windows. If windows are already cached there, will load them instead of re-creating them. If they're not present, will save them after creation.
 - ` window_type` which can be defined as `"gaussian"` or `"cosine"`.
@@ -75,8 +75,8 @@ We can also change a number of other optional parameters:
 pw = fen.PoolingWindows(
   scaling=0.5,
   img_res=(256,256),
-  min_eccentricity=0.5,
-  max_eccentricity=15,
+  min_ecc=0.5,
+  max_ecc=15,
   window_type="gaussian"
 )
 ```
@@ -124,8 +124,8 @@ In the following plot, note how decreasing the scaling (while holding other argu
 ```{code-cell} ipython3
 scaling_5win = fen.calculate.scaling(n_windows=5, min_ecc=1, max_ecc=10, std_dev=1)
 scaling_10win = fen.calculate.scaling(n_windows=10, min_ecc=1, max_ecc=10, std_dev=1)
-pw_5win = fen.PoolingWindows(scaling_5win, (256,256), min_eccentricity=1, max_eccentricity=10)
-pw_10win = fen.PoolingWindows(scaling_10win, (256,256), min_eccentricity=1, max_eccentricity=10)
+pw_5win = fen.PoolingWindows(scaling_5win, (256,256), min_ecc=1, max_ecc=10)
+pw_10win = fen.PoolingWindows(scaling_10win, (256,256), min_ecc=1, max_ecc=10)
 
 ax = pw_5win.plot_windows(subset=False);
 ax.set_title(f"Scaling = {scaling_5win:.4f}");
@@ -187,7 +187,7 @@ In addition to the main functionality of creating and visualizing windows, we al
 
 ### Summarizing Window Sizes
 
-We also have a few additional helper functions for understanding the windows, including plotting the window widths (left) and window areas (right). Both of these figures show the window sizes along the y axes as the eccentricity increases along the x axes, measured in degrees of visual angle (calculated based on `min_eccentricity` and `max_eccentricity`).
+We also have a few additional helper functions for understanding the windows, including plotting the window widths (left) and window areas (right). Both of these figures show the window sizes along the y axes as the eccentricity increases along the x axes, measured in degrees of visual angle (calculated based on `min_ecc` and `max_ecc`).
 
 The window widths figure depicts two measurements: width of the windows along the radial (long) axis and angular (short) axis. Each individual window's size is defined by three measurements: 'top', 'half', and 'full' widths. Top is the width of the flat-top region of each window where the window's value is 1 (only present for cosine windows); full is the width of the entire window; half is the width at the half-max value. To get the approximate area, we multiply the radial width against the corresponding angular width, then divide by {math}`\frac{\pi}{4}`.
 
