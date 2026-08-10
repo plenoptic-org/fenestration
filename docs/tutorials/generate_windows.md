@@ -86,12 +86,10 @@ pw = fen.PoolingWindows(
 To return the pooled averages of your input (an image, for example), use the {meth}`~fenestration.PoolingWindows.forward` method. Let's say we are using a 2d (grayscale) image. {class}`~fenestration.PoolingWindows` operates on 4d tensors (batch by channel by height by width; the convention for images in `pytorch`) or dictionaries of 4d tensors as input, so we will first have to unsqueeze the image until it is 4d.
 
 ```{code-cell} ipython3
-img = torch.rand((256, 256), dtype=torch.float32)
-while img.ndim < 4:
-    img = img.unsqueeze(0)
+img = torch.rand((1, 1, 256, 256), dtype=torch.float32)
 ```
 
-Then we can call `pw.forward()` on the image! The output tensor(s) will be 3d with shape batch by channel by windows.
+Then we can call `pw.forward()` on the image! The output tensor(s) will be 3d with shape batch by channel by windows, where the batch and channel are handled independently.
 
 ```{admonition} Note
 :class: dropdown note
