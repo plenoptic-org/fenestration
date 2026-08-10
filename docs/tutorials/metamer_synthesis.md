@@ -61,8 +61,7 @@ We begin by using plenoptic's [data](https://docs.plenoptic.org/docs/tags/2.1.0/
 ```{code-cell} ipython3
 reptile = po.data.reptile_skin()
 einstein = po.data.einstein()
-imgs = torch.cat([reptile, einstein])
-po.plot.imshow(imgs);
+po.plot.imshow([reptile, einstein]);
 ```
 
 ## Visualizing Pooled Windows
@@ -75,11 +74,11 @@ Here, we define pooling windows with `scaling=0.5`. In the left figures, we have
 model = fen.PoolingWindows(0.5,reptile.shape[-2:])
 
 fig, axes = plt.subplots(2, 2, figsize=(8,8), layout="tight")
-po.plot.imshow(imgs, batch_idx=0, ax=axes[0,0], title=None)
+po.plot.imshow(reptile, ax=axes[0,0], title=None)
 model.plot_windows(ax=axes[0,0])
 model.plot_window_values(reptile, ax=axes[0,1], subset=False)
 axes[0,1].invert_yaxis()
-po.plot.imshow(imgs, batch_idx=1, ax=axes[1,0], title=None)
+po.plot.imshow(einstein, ax=axes[1,0], title=None)
 model.plot_windows(ax=axes[1,0])
 model.plot_window_values(einstein, ax=axes[1,1], subset=False)
 axes[1,1].invert_yaxis()
@@ -92,24 +91,26 @@ Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model wo
 ```{code-cell} ipython3
 model.eval()
 po.remove_grad(model)
-met = po.Metamer(imgs, model)
-met.synthesize(store_progress=True, max_iter=200);
+met_reptile = po.Metamer(reptile, model)
+met_reptile.synthesize(store_progress=True, max_iter=200);
+met_einstein = po.Metamer(einstein, model)
+met_einstein.synthesize(store_progress=True, max_iter=200);
 ```
 
 We see that the loss has converged, great! Let's check out our metamers and plot the loss and error across each iteration. Since the model only cares about the average pixel values in each window, the metamer will also maintain the corresponding average pixel values in each window region, but does not "see" the noise in the generated image. Also note how the correspondence to the original image changes based on eccentricity due to the increasing window sizes.
 
 ```{code-cell} ipython3
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
-po.plot.imshow(imgs, batch_idx=0, ax=axes[0], title="target image")
+po.plot.imshow(reptile, ax=axes[0], title="target image")
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
-po.plot.synthesis_status(met, batch_idx = 0, fig=fig, axes_idx={"misc": 0});
+po.plot.synthesis_status(met_reptile, fig=fig, axes_idx={"misc": 0});
 
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
-po.plot.imshow(imgs, batch_idx=1, ax=axes[0], title="target image")
+po.plot.imshow(einstein, ax=axes[0], title="target image")
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
-po.plot.synthesis_status(met, batch_idx = 1, fig=fig, axes_idx={"misc": 0});
+po.plot.synthesis_status(met_einstein, fig=fig, axes_idx={"misc": 0});
 ```
 
 ## Changing Scaling Values
@@ -120,11 +121,11 @@ Now let's see how the scaling value impacts our metamers. Here we decrease `scal
 model = fen.PoolingWindows(0.25,reptile.shape[-2:])
 
 fig, axes = plt.subplots(2, 2, figsize=(8,8), layout="tight")
-po.plot.imshow(imgs, batch_idx=0, ax=axes[0,0], title=None)
+po.plot.imshow(reptile, ax=axes[0,0], title=None)
 model.plot_windows(ax=axes[0,0])
 model.plot_window_values(reptile, ax=axes[0,1], subset=False)
 axes[0,1].invert_yaxis()
-po.plot.imshow(imgs, batch_idx=1, ax=axes[1,0], title=None)
+po.plot.imshow(einstein, ax=axes[1,0], title=None)
 model.plot_windows(ax=axes[1,0])
 model.plot_window_values(einstein, ax=axes[1,1], subset=False)
 axes[1,1].invert_yaxis()
@@ -133,7 +134,7 @@ axes[1,1].invert_yaxis()
 Also note the warning that we get now about some windows being smaller than a pixel! If the scaling value is small, it's possible for the smallest windows to be smaller than a pixel and not included in the windows, similar to the central region below `min_ecc`. You can access the minimum eccentricity for avoiding this issue with the attribute `self.calculated_min_eccentricity_degrees`. We can zoom in and see the small windows here:
 
 ```{code-cell} ipython3
-fig = po.plot.imshow(imgs, batch_idx=0, title=None)
+fig = po.plot.imshow(reptile, title=None)
 model.plot_windows(ax=fig.axes[0]);
 plt.xlim(128,180);
 plt.ylim(102,152);
@@ -145,20 +146,22 @@ Despite this, we can still generate our metamer! Since we are using smaller wind
 ```{code-cell} ipython3
 model.eval()
 po.remove_grad(model)
-met = po.Metamer(imgs, model)
-met.synthesize(store_progress=True, max_iter=200);
+met_reptile = po.Metamer(reptile, model)
+met_reptile.synthesize(store_progress=True, max_iter=200);
+met_einstein = po.Metamer(einstein, model)
+met_einstein.synthesize(store_progress=True, max_iter=200);
 
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
-po.plot.imshow(imgs, batch_idx=0, ax=axes[0], title="target image")
+po.plot.imshow(reptile, ax=axes[0], title="target image")
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
-po.plot.synthesis_status(met, batch_idx = 0, fig=fig, axes_idx={"misc": 0});
+po.plot.synthesis_status(met_reptile, fig=fig, axes_idx={"misc": 0});
 
 fig, axes = plt.subplots(1, 4, figsize=(16,4), layout="tight")
-po.plot.imshow(imgs, batch_idx=1, ax=axes[0], title="target image")
+po.plot.imshow(einstein, ax=axes[0], title="target image")
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
-po.plot.synthesis_status(met, batch_idx = 1, fig=fig, axes_idx={"misc": 0});
+po.plot.synthesis_status(met_einstein, fig=fig, axes_idx={"misc": 0});
 ```
 
 ## Comparing Window Types
