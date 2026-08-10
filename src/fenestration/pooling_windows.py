@@ -1373,7 +1373,7 @@ class PoolingWindows(nn.Module):
         Raises
         ------
         ValueError
-            If ``units`` are not "pixels" or "degrees"
+            If :attr:`units` are not "pixels" or "degrees"
 
         Examples
         --------

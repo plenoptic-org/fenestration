@@ -26,6 +26,11 @@ the angle and eccentricity windows without the added functionality of :class:`~f
 Pooling
 -------
 
+These are additional helper functions related to creating pooling windows. The two
+window types are :meth:`~fenestration.pooling.gaussian` and :meth:`~fenestration.pooling.raised_cosine`.
+Additionally, :meth:`~fenestration.pooling.normalize_windows` is helpful for ensuring that varying
+eccentricities of :meth:`~fenestration.create_pooling_windows` all contribute equally.
+
 .. currentmodule:: fenestration.pooling
 .. autosummary::
     :toctree: generated
@@ -38,6 +43,10 @@ Pooling
 Calculate
 ---------
 
+Methods for computing conversions, from degrees to pixels (:meth:`~fenestration.calculate.deg_to_pix`) and
+calculating a specific scaling value based on a required number of windows and eccentricity ranges
+(:meth:`~fenestration.calculate.scaling`).
+
 .. currentmodule:: fenestration.calculate
 .. autosummary::
     :toctree: generated
@@ -48,6 +57,11 @@ Calculate
 
 Sampling
 --------
+
+When creating pooling windows, it is important to ensure that any sampling does not result in aliasing,
+in which there are incorrect measurements in the reconstructed signal. These methods allow you to check this
+property using a specified function, domain, and how to sample that domain. Furthermore, you can
+visualize interpolation coefficients and resulting signals.
 
 .. currentmodule:: fenestration.sampling
 .. autosummary::
