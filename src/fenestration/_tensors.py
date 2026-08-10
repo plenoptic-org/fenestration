@@ -1,4 +1,4 @@
-"""External utility functions to assist with tensor generation.
+"""Utility functions to assist with tensor generation.
 
 pooling_windows.py contains the PoolingWindows class, which uses most of these
 functions
@@ -39,7 +39,7 @@ def _to_numpy(x: torch.Tensor | np.ndarray) -> np.ndarray:
 
 
 def _polar_radius(
-    size: int | tuple[int, int],
+    img_res: int | tuple[int, int],
     exponent: float = 1,
     origin: int | tuple[int, int] | None = None,
     device: torch.device | str | None = None,
@@ -51,9 +51,9 @@ def _polar_radius(
 
     Arguments
     ---------
-    size
-        if an int, we assume the image should be of dimensions `(size,
-        size)`. if a tuple, must be a 2-tuple of ints specifying the
+    img_res
+        if an int, we assume the image should be of dimensions `(img_res,
+        img_res)`. if a tuple, must be a 2-tuple of ints specifying the
         dimensions
     exponent
         the exponent of the radial ramp function.
@@ -62,21 +62,21 @@ def _polar_radius(
         `(origin, origin)`. if a tuple, must be a 2-tuple of ints
         specifying the origin (where `(0, 0)` is the upper left).  if
         None, we assume the origin lies at the center of the matrix,
-        `(size+1)/2`.
+        `(img_res+1)/2`.
     device
         the device to create this tensor on
 
     Returns
     -------
-    res
+    polar_rad
         the polar radius matrix
 
     """
-    if not hasattr(size, "__iter__"):
-        size = (size, size)
+    if not hasattr(img_res, "__iter__"):
+        img_res = (img_res, img_res)
 
     if origin is None:
-        origin = ((size[0] + 1) / 2.0, (size[1] + 1) / 2.0)
+        origin = ((img_res[0] + 1) / 2.0, (img_res[1] + 1) / 2.0)
     elif not hasattr(origin, "__iter__"):
         origin = (origin, origin)
 
@@ -86,22 +86,22 @@ def _polar_radius(
     # we have to reverse the order from (size[1], size[0]) to (size[0],
     # size[1])
     yramp, xramp = torch.meshgrid(
-        torch.arange(1, size[0] + 1, device=device) - origin[0],
-        torch.arange(1, size[1] + 1, device=device) - origin[1],
+        torch.arange(1, img_res[0] + 1, device=device) - origin[0],
+        torch.arange(1, img_res[1] + 1, device=device) - origin[1],
     )
 
     if exponent <= 0:
         # zero to a negative exponent raises:
         # ZeroDivisionError: 0.0 cannot be raised to a negative power
         r = xramp**2 + yramp**2
-        res = np.power(r, exponent / 2.0, where=(r != 0))
+        polar_rad = np.power(r, exponent / 2.0, where=(r != 0))
     else:
-        res = (xramp**2 + yramp**2) ** (exponent / 2.0)
-    return res
+        polar_rad = (xramp**2 + yramp**2) ** (exponent / 2.0)
+    return polar_rad
 
 
 def _polar_angle(
-    size: int | tuple,
+    img_res: int | tuple,
     phase: float = 0,
     origin: int | tuple[int, int] | None = None,
     device: torch.device | str | None = None,
@@ -114,30 +114,30 @@ def _polar_angle(
 
     Arguments
     ---------
-    size
-        if an int, we assume the image should be of dimensions `(size, size)`. if a
-        tuple, must be a 2-tuple of ints specifying the dimensions
+    img_res
+        if an int, we assume the image should be of dimensions `(img_res, img_res)`. if
+        a tuple, must be a 2-tuple of ints specifying the dimensions
     phase
         the phase of the polar angle function (in radians, clockwise from the X-axis)
     origin
         the center of the image. if an int, we assume the origin is at
         `(origin, origin)`. if a tuple, must be a 2-tuple of ints specifying the
         origin (where `(0, 0)` is the upper left). if None, we assume the origin lies
-        at the center of the matrix, `(size+1)/2`.
+        at the center of the matrix, `(img_res+1)/2`.
     device
         the device to create this tensor on
 
     Returns
     -------
-    res
+    polar_ang
         the polar angle matrix
 
     """
-    if not hasattr(size, "__iter__"):
-        size = (size, size)
+    if not hasattr(img_res, "__iter__"):
+        img_res = (img_res, img_res)
 
     if origin is None:
-        origin = ((size[0] + 1) / 2.0, (size[1] + 1) / 2.0)
+        origin = ((img_res[0] + 1) / 2.0, (img_res[1] + 1) / 2.0)
     elif not hasattr(origin, "__iter__"):
         origin = (origin, origin)
 
@@ -147,12 +147,12 @@ def _polar_angle(
     # we have to reverse the order from (size[1], size[0]) to (size[0],
     # size[1])
     yramp, xramp = torch.meshgrid(
-        torch.arange(1, size[0] + 1, device=device) - origin[0],
-        torch.arange(1, size[1] + 1, device=device) - origin[1],
+        torch.arange(1, img_res[0] + 1, device=device) - origin[0],
+        torch.arange(1, img_res[1] + 1, device=device) - origin[1],
     )
 
-    res = torch.atan2(yramp, xramp)
+    polar_ang = torch.atan2(yramp, xramp)
 
-    res = ((res + (np.pi - phase)) % (2 * np.pi)) - np.pi
+    polar_ang = ((polar_ang + (np.pi - phase)) % (2 * np.pi)) - np.pi
 
-    return res
+    return polar_ang

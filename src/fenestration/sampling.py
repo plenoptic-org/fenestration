@@ -33,25 +33,25 @@ def check_sampling(
     val_sampling: float | None = 0.5,
     pix_sampling: int | None = None,
     func: Callable[[float | np.ndarray], np.ndarray] = gaussian,
-    x: torch.Tensor | np.ndarray = torch.linspace(-5, 5, 101),
+    x: torch.Tensor | np.ndarray | None = None,
     **func_kwargs: Any,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     r"""Check how sampling relates to interpolation quality.
 
     Given a function, a domain, and how to sample that domain, this
-    function will use linear algebra (``np.linalg.lstsq``) to determine
+    function will use linear algebra (:func:`numpy.linalg.lstsq`) to determine
     how to interpolate the function so that it's centered on each
-    pixel. You can then use functions like ``plot_coeffs`` and
-    ``create_movie`` to see the quality of this interpolation
+    pixel. You can then use functions like :meth:`plot_coeffs` and
+    :meth:`create_movie` to see the quality of this interpolation
 
     The idea here is to take a function (for example,
-    ``fen.pooling.gaussian``) and say that we have this function
+    :meth:`~fenestration.pooling.gaussian`) and say that we have this function
     defined at, e.g., every 10 pixels on the array ``linspace(-5, 5,
     101)``. We want to answer then, the question of how well we can
     interpolate to all the intermediate functions, that is, the
     functions centered on each pixel in the array.
 
-    You can either specify the spacing in pixels (``pix_sampling``) xor
+    You can either specify the spacing in pixels (``pix_sampling``) XOR
     in x values (``val_sampling``), but exactly one of them must be set.
 
     Your function can either be a torch or numpy function, but ``x``
@@ -67,13 +67,14 @@ def check_sampling(
         If int, how far apart (in pixels) each sampled function should
         be. If None, we use ``val_sampling`` instead.
     func
-        the function to check interpolation for. must take ``x`` as its
+        The function to check interpolation for. Must take ``x`` as its
         first input, all additional kwargs can be specified in
-        ``func_kwargs``
+        ``func_kwargs``.
     x
-        the 1d tensor/array to evaluate ``func`` on.
+        The 1d tensor/array to evaluate ``func`` on. If ``x`` is not set,
+        default is ``torch.linspace(-5, 5, 101)``.
     func_kwargs
-        additional kwargs to pass to ``func``
+        Additional kwargs to pass to ``func``
 
     Returns
     -------
@@ -89,7 +90,7 @@ def check_sampling(
     coeffs
         the array of coefficients to transform ``sampled`` to
         ``full``. This has been transposed from the array returned by
-        ``np.linalg.lstsq`` and thus will have the same shape as
+        :func:`numpy.linalg.lstsq` and thus will have the same shape as
         ``sampled`` (this is to make it easier to restrict which coeffs
         to look at, since they'll be more easily indexed along first
         dimension)
@@ -102,6 +103,8 @@ def check_sampling(
         If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
 
     """
+    if x is None:
+        x = torch.linspace(-5, 5, 101)
     if val_sampling is not None:
         if pix_sampling is not None:
             raise Exception("One of val_sampling or pix_sampling must be None!")
@@ -172,7 +175,7 @@ def interpolation_plot(
     residuals: np.ndarray,
     pix: int | None = 0,
     val: float | None = None,
-    x: torch.Tensor | np.ndarray = np.linspace(-5, 5, 101),
+    x: torch.Tensor | np.ndarray | None = None,
     full: np.ndarray | None = None,
 ) -> Figure:
     r"""Create plot showing interpolation results at specified pixel or value.
@@ -194,8 +197,8 @@ def interpolation_plot(
     val
         we plot the interpolated function centered at this x-value
     x
-        the 1d tensor/array passed to ``check_sampling()``. the default
-        here is the default there. plotted on x-axis
+        the 1d tensor/array passed to :meth:`check_sampling`. If ``x`` is
+        not set, default is ``torch.linspace(-5, 5, 101)`` as in :meth:`check_sampling`.
     full
         the array of functions centered at each pixel. If None, won't
         plot. If not None, will plot as dashed line behind the
@@ -212,6 +215,8 @@ def interpolation_plot(
         If neither ``val_sampling`` nor ``pix_sampling`` are set to ``None``
 
     """
+    if x is None:
+        x = torch.linspace(-5, 5, 101)
     if val is not None:
         if pix is not None:
             raise Exception("One of val_sampling or pix_sampling must be None!")
@@ -237,7 +242,7 @@ def interpolation_plot(
 def create_movie(
     interpolated: np.ndarray,
     residuals: np.ndarray,
-    x: torch.Tensor | np.ndarray = np.linspace(-5, 5, 101),
+    x: torch.Tensor | np.ndarray | None = None,
     full: np.ndarray | None = None,
     framerate: int = 10,
 ) -> animation.FuncAnimation:
@@ -248,7 +253,7 @@ def create_movie(
     residuals.
 
     the more finely sampled your ``x`` was when calling
-    ``check_sampling()`` (and thus the larger your ``interpolated`` and
+    :meth:`check_sampling` (and thus the larger your ``interpolated`` and
     ``full`` arrays), the longer this will take. Calling this function
     will not take too long, but displaying or saving the returned
     animation will.
@@ -260,8 +265,8 @@ def create_movie(
     residuals
         the errors for each interpolation
     x
-        the 1d tensor/array passed to ``check_sampling()``. the default
-        here is the default there. plotted on x-axis
+        the 1d tensor/array passed to :meth:`check_sampling`. If ``x`` is
+        not set, default is ``torch.linspace(-5, 5, 101)`` as in :meth:`check_sampling`.
     full
         the array of functions centered at each pixel. If None, won't
         plot. If not None, will plot as dashed line behind the
@@ -275,6 +280,8 @@ def create_movie(
         The animation object.
 
     """
+    if x is None:
+        x = torch.linspace(-5, 5, 101)
     x = _tensors._to_numpy(x)
     fig = interpolation_plot(interpolated, residuals, x=x, full=full)
     if full is not None:
