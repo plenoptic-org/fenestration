@@ -215,6 +215,16 @@ class TestPooling:
                 0.8, rand_img.shape[-2:], num_scales=2, cache_dir=tmp_path
             )
 
+    @pytest.mark.skipif(DEVICE.type == "cpu", reason="Only makes sense to test on cuda")
+    def test_PoolingWindows_cache_maploc(self, rand_img, tmp_path):
+        pw = fen.PoolingWindows(0.8, rand_img.shape[-2:], cache_dir=tmp_path)
+        assert pathlib.Path(pw.cache_dir) == tmp_path
+        assert pw.angle_windows[0].device.type == "cpu"
+        pw_new = fen.PoolingWindows(
+            0.8, rand_img.shape[-2:], cache_dir=tmp_path, cache_map_location="cuda"
+        )
+        assert pw_new.angle_windows[0].device.type == "cuda"
+
     def test_PoolingWindows_save(self, rand_img, tmp_path):
         pw = fen.PoolingWindows(0.8, rand_img.shape[-2:])
         pw.save(tmp_path / "model.pt")
