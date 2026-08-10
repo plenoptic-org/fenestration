@@ -19,7 +19,15 @@ extensions = [
     "sphinx.ext.autodoc",
     "matplotlib.sphinxext.plot_directive",
     "myst_nb",
+    "sphinx.ext.intersphinx",
 ]
+
+intersphinx_mapping = {
+    "torch": ("https://docs.pytorch.org/docs/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "python": ("https://docs.python.org/3/", None),
+}
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
@@ -50,7 +58,7 @@ napoleon_use_rtype = False
 autodoc_default_options = {
     "members": True,
     "show-inheritance": False,
-    "member-order": "groupwise",
+    "member-order": "bysource",
 }
 
 # -- Options for HTML output -------------------------------------------------
@@ -62,6 +70,9 @@ html_static_path = ["_static"]
 # Path for static files (custom stylesheets or JavaScript)
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+
+# SPHINX CROSS REFERENCES
+add_function_parentheses = False
 
 # Enable automatic stub page generation
 autosummary_generate = True
