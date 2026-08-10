@@ -80,6 +80,8 @@ add_function_parentheses = False
 autosummary_generate = True
 
 
+# the following is copied from plenoptic:
+# https://github.com/plenoptic-org/plenoptic/blob/0a28fa537f6ce650f1e76d4035429cd7a6d959c1/docs/conf.py#L409
 # this sphinx event allows us to have fine-grained control over whether to document
 # objects or not
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#event-autodoc-skip-member
