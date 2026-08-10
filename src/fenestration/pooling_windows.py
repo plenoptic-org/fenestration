@@ -64,7 +64,7 @@ class PoolingWindows(nn.Module):
     We can optionally cache the windows tensor we create, if
     :attr:`cache_dir` is not ``None``. In that case, we'll also check to see if
     appropriate cached windows exist before creating them and load them
-    to specified ``cache_map_loc`` if they do. The path we'll use is
+    to specified ``cache_map_location`` if they do. The path we'll use is
     ``{cache_dir}/scaling-{scaling}_size-{img_res}_e0-{min_eccentricity}_
     em-{max_eccentricity}_{window_type}.pt``. We'll cache each scale separately,
     changing the img_res (and potentially min_eccentricity) values in that save
@@ -216,7 +216,7 @@ class PoolingWindows(nn.Module):
         max_ecc: float = 15,
         num_scales: int = 1,
         cache_dir: str | None = None,
-        cache_map_loc: Callable[[Storage, str], Storage]
+        cache_map_location: Callable[[Storage, str], Storage]
         | torch.device
         | str
         | dict[str, str]
@@ -302,7 +302,7 @@ class PoolingWindows(nn.Module):
                     warnings.warn(f"Loading windows from cache: {self.cache_paths[-1]}")
                     windows = torch.load(
                         self.cache_paths[-1],
-                        map_location=cache_map_loc,
+                        map_location=cache_map_location,
                         weights_only=True,
                     )
                     angle_windows = windows["angle"]
