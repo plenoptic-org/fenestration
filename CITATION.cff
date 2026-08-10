@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the preferred-citation metadata."
+title: "Fenestration: A tool for generated foveated pooling windows"
+authors:
+  - family-names: Broderick
+    given-names: William
+    orcid: "https://orcid.org/0000-0002-8999-9003"
+  - family-names: Meyer
+    given-names: Emily E
+    orcid: "https://orcid.org/0009-0004-1302-1510"
+repository-code: "https://github.com/plenoptic-org/fenestration"
+url: "https://pooling-windows.readthedocs.io"
+license: MIT
+keywords:
+  - image processing
+  - computational models
+  - visual perception

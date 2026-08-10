@@ -71,7 +71,8 @@ def check_sampling(
         first input, all additional kwargs can be specified in
         ``func_kwargs``.
     x
-        The 1d tensor/array to evaluate ``func`` on.
+        The 1d tensor/array to evaluate ``func`` on. If ``x`` is not set,
+        default is ``torch.linspace(-5, 5, 101)``.
     func_kwargs
         Additional kwargs to pass to ``func``
 
@@ -105,7 +106,7 @@ def check_sampling(
 
     """
     if x is None:
-        raise ValueError("Argument x has not been set!")
+        x = torch.linspace(-5, 5, 101)
     if val_sampling is not None:
         if pix_sampling is not None:
             raise ValueError("One of val_sampling or pix_sampling must be None!")
@@ -198,8 +199,8 @@ def interpolation_plot(
     val
         we plot the interpolated function centered at this x-value
     x
-        the 1d tensor/array passed to :meth:`check_sampling`. the default
-        here is the default there. plotted on x-axis
+        the 1d tensor/array passed to :meth:`check_sampling`. If ``x`` is
+        not set, default is ``torch.linspace(-5, 5, 101)`` as in :meth:`check_sampling`.
     full
         the array of functions centered at each pixel. If None, won't
         plot. If not None, will plot as dashed line behind the
@@ -219,7 +220,7 @@ def interpolation_plot(
 
     """
     if x is None:
-        raise ValueError("Argument x has not been set!")
+        x = torch.linspace(-5, 5, 101)
     if val is not None:
         if pix is not None:
             raise ValueError("One of val_sampling or pix_sampling must be None!")
@@ -268,8 +269,8 @@ def create_movie(
     residuals
         the errors for each interpolation
     x
-        the 1d tensor/array passed to :meth:`check_sampling`. the default
-        here is the default there. plotted on x-axis
+        the 1d tensor/array passed to :meth:`check_sampling`. If ``x`` is
+        not set, default is ``torch.linspace(-5, 5, 101)`` as in :meth:`check_sampling`.
     full
         the array of functions centered at each pixel. If None, won't
         plot. If not None, will plot as dashed line behind the
@@ -282,14 +283,9 @@ def create_movie(
     anim
         The animation object.
 
-    Raises
-    ------
-    ValueError
-        If ``x`` is not set
-
     """
     if x is None:
-        raise ValueError("Argument x has not been set!")
+        x = torch.linspace(-5, 5, 101)
     x = _tensors._to_numpy(x)
     fig = interpolation_plot(interpolated, residuals, x=x, full=full)
     if full is not None:
