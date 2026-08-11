@@ -65,7 +65,7 @@ class PoolingWindows(nn.Module):
     if they do. The path we'll use is
     ``{cache_dir}/scaling-{scaling}_size-{img_res}_e0-{min_ecc}_
     em-{max_ecc}_{window_type}.pt``. We'll cache each scale separately,
-    changing the img_res (and potentially min_ecc) values in that save
+    changing the :attr:`img_res` (and potentially :attr:`min_ecc`) values in that save
     path appropriately.
 
     Parameters
