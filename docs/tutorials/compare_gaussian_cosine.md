@@ -86,8 +86,8 @@ At the same scaling value, there are many more gaussian windows! It's important 
 Let's find a pair of windows that approximately match in terms of FWHM (this requires a bit of trial and error to find corresponding indices) and compare the two window types. Also note the warnings that appear if windows are calculated to be smaller than a pixel at some scales!
 
 ```{code-cell} ipython3
-pw_cosine = fen.PoolingWindows(0.5, (256, 256), max_eccentricity=13, num_scales=4, window_type="cosine")
-pw_gauss = fen.PoolingWindows(0.5, (256, 256), max_eccentricity=13, num_scales=5, window_type="gaussian")
+pw_cosine = fen.PoolingWindows(0.5, (256, 256), max_ecc=13, num_scales=4, window_type="cosine")
+pw_gauss = fen.PoolingWindows(0.5, (256, 256), max_ecc=13, num_scales=5, window_type="gaussian")
 
 win_cosine = pw_cosine.ecc_windows[1][4]*pw_cosine.angle_windows[1][5]
 win_gauss = pw_gauss.ecc_windows[1][11]*pw_gauss.angle_windows[1][12]
@@ -132,8 +132,8 @@ pw_gauss.plot_windows(subset=False);
 Now let's decrease the scaling and find another pair of windows that match in terms of FWHM and compare the two window types.
 
 ```{code-cell} ipython3
-pw_cosine = fen.PoolingWindows(0.25, (256, 256), max_eccentricity=13, num_scales=4, window_type="cosine")
-pw_gauss = fen.PoolingWindows(0.25, (256, 256), max_eccentricity=13, num_scales=5, window_type="gaussian")
+pw_cosine = fen.PoolingWindows(0.25, (256, 256), max_ecc=13, num_scales=4, window_type="cosine")
+pw_gauss = fen.PoolingWindows(0.25, (256, 256), max_ecc=13, num_scales=5, window_type="gaussian")
 
 win_cosine = pw_cosine.ecc_windows[1][10]*pw_cosine.angle_windows[1][11]
 win_gauss = pw_gauss.ecc_windows[1][25]*pw_gauss.angle_windows[1][25]
