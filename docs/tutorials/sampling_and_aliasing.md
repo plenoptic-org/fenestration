@@ -83,6 +83,7 @@ plt.close()
 anim
 ```
 
+(unsuccessful-sampling)=
 ## Unsuccessful sampling
 
 Alright, that was pretty boring, so let's do this whole thing again, but with sparser sampling and see that the interpolation does not look as good.
