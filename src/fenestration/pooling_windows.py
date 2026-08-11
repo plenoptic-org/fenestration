@@ -299,7 +299,10 @@ class PoolingWindows(nn.Module):
                 self.cache_paths.append(cache_path_template.format(**format_kwargs))
                 if op.exists(self.cache_paths[-1]):
                     warnings.warn(f"Loading windows from cache: {self.cache_paths[-1]}")
-                    windows = torch.load(self.cache_paths[-1])
+                    windows = torch.load(
+                        self.cache_paths[-1],
+                        weights_only=True,
+                    )
                     angle_windows = windows["angle"]
                     ecc_windows = windows["ecc"]
             if angle_windows is None or ecc_windows is None:
