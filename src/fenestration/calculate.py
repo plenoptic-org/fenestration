@@ -123,7 +123,7 @@ def _eccentricity_window_spacing(
 
     Raises
     ------
-    Exception
+    ValueError
         If ``n_windows`` or ``scaling`` is not set
 
     Notes
@@ -173,7 +173,7 @@ def _eccentricity_window_spacing(
     elif n_windows is not None:
         spacing = (np.log(max_ecc) - np.log(min_ecc)) / n_windows
     else:
-        raise Exception("Exactly one of n_windows or scaling must be set!")
+        raise ValueError("Exactly one of n_windows or scaling must be set!")
     return spacing
 
 
@@ -370,8 +370,10 @@ def _windows_eccentricity(
 
     Raises
     ------
-    Exception
+    ValueError
         If ``ecc_type`` takes an illegal value.
+    ValueError
+        If ``ecc_type`` is set but ``std_dev`` is not.
 
     Notes
     -----
@@ -419,7 +421,7 @@ def _windows_eccentricity(
 
     """
     if ecc_type not in ["min", "max", "central"] and not ecc_type.endswith("std"):
-        raise Exception(f"Don't know how to handle ecc_type {ecc_type}")
+        raise ValueError(f"Don't know how to handle ecc_type {ecc_type}")
     if ecc_type == "central":
         ecc = [
             min_ecc * np.exp(window_spacing * (i + 1))
@@ -465,7 +467,7 @@ def _windows_eccentricity(
             ]
     elif ecc_type.endswith("std"):
         if std_dev is None:
-            raise Exception(f"std_dev must be set if ecc_type == {ecc_type}")
+            raise ValueError(f"std_dev must be set if ecc_type == {ecc_type}")
         else:
             n = int(re.findall("([-0-9]+)std", ecc_type)[0])
             ecc = [

@@ -134,3 +134,6 @@ docs/api/generated
 
 # saved files
 *.pt
+
+# pytorch version checker
+pytorch.toml
