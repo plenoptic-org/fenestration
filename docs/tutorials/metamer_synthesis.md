@@ -73,7 +73,7 @@ Here, we define pooling windows with `scaling=0.8`. In the left figures, we have
 model = fen.PoolingWindows(0.8,reptile.shape[-2:])
 
 with plt.rc_context(rcContext):
-    fig, axes = plt.subplots(2, 2, figsize=(8,8), layout="tight", sharex="all", sharey="all")
+    fig, axes = plt.subplots(2, 2, figsize=(20,20), layout="tight", sharex="all", sharey="all")
     po.plot.imshow(reptile, ax=axes[0,0], title=None)
     model.plot_windows(ax=axes[0,0])
     model.plot_window_values(reptile, ax=axes[0,1], subset=False)
@@ -90,9 +90,9 @@ Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model wo
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
-met_reptile.synthesize(store_progress=True, max_iter=200);
+met_reptile.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
-met_einstein.synthesize(store_progress=True, max_iter=200);
+met_einstein.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
 ```
 
 We see that the loss has converged, great! Let's check out our metamers and plot the loss and error across each iteration. Since the model only cares about the average pixel values in each window, the metamer will also maintain the corresponding average pixel values in each window region, but does not "see" the noise in the generated image. Also note how the correspondence to the original image changes based on eccentricity due to the increasing window sizes.
@@ -110,7 +110,7 @@ Now let's see how the scaling value impacts our metamers. Here we decrease `scal
 model = fen.PoolingWindows(0.4,reptile.shape[-2:])
 
 with plt.rc_context(rcContext):
-    fig, axes = plt.subplots(2, 2, figsize=(8,8), layout="tight", sharex="all", sharey="all")
+    fig, axes = plt.subplots(2, 2, figsize=(20,20), layout="tight", sharex="all", sharey="all")
     po.plot.imshow(reptile, ax=axes[0,0], title=None)
     model.plot_windows(ax=axes[0,0])
     model.plot_window_values(reptile, ax=axes[0,1], subset=False)
@@ -134,9 +134,9 @@ Despite this, we can still generate our metamer! Since we are using smaller wind
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
-met_reptile.synthesize(store_progress=True, max_iter=200);
+met_reptile.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
-met_einstein.synthesize(store_progress=True, max_iter=200);
+met_einstein.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
 
 po.plot.synthesis_status(met_reptile);
 po.plot.synthesis_status(met_einstein);
@@ -147,12 +147,11 @@ po.plot.synthesis_status(met_einstein);
 Although we have been using gaussian windows for the synthesis thus far, `fenestration` also supports raised-cosine windows. Using `scaling=0.5`, we will generate metamers using each window type. First, let's visualize the differences in size and shape of each window type for the same scaling value on the Einstein image. See Comparing Window Types tutorial for additonal information comparing gaussian and cosine windows.
 
 ```{code-cell} ipython3
-model_gauss = fen.PoolingWindows(0.5, einstein.shape[-2:], window_type="gaussian")
-model_cosine = fen.PoolingWindows(0.5, einstein.shape[-2:], window_type="cosine")
+model_cosine = fen.PoolingWindows(0.4, einstein.shape[-2:], window_type="cosine")
 
 fig, axes = plt.subplots(1, 2, figsize=(8,4), layout="tight", sharex="all", sharey="all")
 po.plot.imshow(einstein, ax=axes[0], title="target image")
-model_gauss.plot_windows(ax=axes[0])
+model.plot_windows(ax=axes[0])
 axes[0].xaxis.set_visible(False)
 axes[0].yaxis.set_visible(False)
 
@@ -165,17 +164,12 @@ axes[1].yaxis.set_visible(False)
 Now let's perform the synthesis for each model. Here we can clearly see the benefit of using the smoother gaussian windows (top row) which generates metamers that eliminate the sharper boundaries and ringing effect present from the cosine windows (bottom row).
 
 ```{code-cell} ipython3
-model_gauss.eval()
-po.remove_grad(model_gauss)
-met_gauss = po.Metamer(einstein, model_gauss)
-met_gauss.synthesize(store_progress=True, max_iter=200);
-
 model_cosine.eval()
 po.remove_grad(model_cosine)
 met_cosine = po.Metamer(einstein, model_cosine)
-met_cosine.synthesize(store_progress=True, max_iter=200);
+met_cosine.synthesize(store_progress=True, max_iter=200, stop_criterion=1e-6);
 
-po.plot.synthesis_status(met_gauss);
+po.plot.synthesis_status(met_einstein);
 po.plot.synthesis_status(met_cosine);
 ```
 
