@@ -65,9 +65,9 @@ po.plot.imshow([reptile, einstein]);
 
 ## Visualizing Pooled Windows
 
-To generate metamers, we first have to define a model which takes in a 4d tensor and performs some computation on the input. The metamer synthesis step starts from a noisy image and tries to minimize the error between the model output of the original image and that of the synthesized image. With this model example, the process will try to minimize error between the pooled values of all windows for the original and synthesized images.
+To generate metamers, we first have to define a model which takes in a 4d tensor and performs some computation on the input. The metamer synthesis step starts from a noisy image and tries to minimize the error between the model output of the original image and that of the synthesized image. With this model, the process will try to minimize error between the pooled values of all windows for the original and synthesized images.
 
-Here, we define pooling windows with `scaling=0.8`. In the left figures, we have overlaid a wedge of pooling windows on the original images to visualize the extent that each pooling window is averaging across. In the right figures, we use the {meth}`~fenestration.PoolingWindows.plot_window_values` method to displayed the pooled image values in each window that we will matching the metamer values to. You can see that the smaller, more central windows maintain information more similar to the original image, while the more eccentric windows have a more blurred representation.
+Here, we define pooling windows with `scaling=0.8`. In the left figures, we have overlaid a wedge of pooling windows on the original images to visualize the intersection points of each pooling window that is averaging across the image. In the right figures, we use the {meth}`~fenestration.PoolingWindows.plot_window_values` method to displayed the pooled image values in each window that we will matching the metamer values to. You can see that the smaller, more central windows maintain information more similar to the original image, while the more eccentric windows have a more blurred representation.
 
 ```{code-cell} ipython3
 model = fen.PoolingWindows(0.8,reptile.shape[-2:])
@@ -84,7 +84,7 @@ with plt.rc_context(rcContext):
 
 ## Synthesizing image metamers
 
-Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model works, let's get to synthesizing some metamers. Here we set our model to evaluation model, remove gradients from its parameters, initialize the metamer object, and run synthesis.
+Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model works, let's get to synthesizing some metamers. Here we set our model to evaluation mode, remove gradients from its parameters, initialize the metamer object, and run synthesis.
 
 ```{code-cell} ipython3
 model.eval()
@@ -144,7 +144,7 @@ po.plot.synthesis_status(met_einstein);
 
 ## Comparing Window Types
 
-Although we have been using gaussian windows for the synthesis thus far, `fenestration` also supports raised-cosine windows. Using `scaling=0.5`, we will generate metamers using each window type. First, let's visualize the differences in size and shape of each window type for the same scaling value on the Einstein image. See Comparing Window Types tutorial for additonal information comparing gaussian and cosine windows.
+Although we have been using gaussian windows for the synthesis thus far, `fenestration` also supports raised-cosine windows. Using `scaling=0.4`, we will generate metamers for the cosine windows and compare to the previous gaussian windows. First, let's visualize the differences in size and shape of each window type for the same scaling value on the Einstein image. See [](compare-window-types) tutorial for additonal information comparing gaussian and cosine windows.
 
 ```{code-cell} ipython3
 model_cosine = fen.PoolingWindows(0.4, einstein.shape[-2:], window_type="cosine")
@@ -161,7 +161,7 @@ axes[1].xaxis.set_visible(False)
 axes[1].yaxis.set_visible(False)
 ```
 
-Now let's perform the synthesis for each model. Here we can clearly see the benefit of using the smoother gaussian windows (top row) which generates metamers that eliminate the sharper boundaries and ringing effect present from the cosine windows (bottom row).
+Now let's perform the synthesis for the cosine windows. Here we can clearly see the benefit of using the smoother gaussian windows (top row) which generates metamers that eliminate the sharper boundaries and ringing effect present from the cosine windows (bottom row).
 
 ```{code-cell} ipython3
 model_cosine.eval()
