@@ -39,9 +39,9 @@ This notebook requires the optional dependency `plenoptic`, which can be install
 
 ```
 
-In this tutorial, we will show how `fenestration` can be used on dictionaries of 4d tensors, like the output of steerable pyramids. Here, we will use the [SteerablePyramidFreq](https://docs.plenoptic.org/docs/pulls/467/api/generated/plenoptic.process.SteerablePyramidFreq.html#plenoptic.process.SteerablePyramidFreq) process from [plenoptic](https://docs.plenoptic.org/docs/pulls/467/index.html).
+In this tutorial, we will show how `fenestration` can be used on dictionaries of 4d tensors, like the output of steerable pyramids. Here, we will use the [SteerablePyramidFreq](https://docs.plenoptic.org/docs/tags/2.1.0/api/generated/plenoptic.process.SteerablePyramidFreq.html#plenoptic.process.SteerablePyramidFreq) process from [plenoptic](https://docs.plenoptic.org/docs/tags/2.1.0/index.html).
 
-The steerable pyramid can be thought of as a bank of oriented bandpass convolutional filters which span all orientations and frequencies. In this way, it is often thought of as having a representation similar to that of the primary visual cortex (V1). For an introduction to steerable pyramids, we recommend [plenoptic's user guide](https://docs.plenoptic.org/docs/pulls/467/user_guide/models_and_metrics/Steerable_Pyramid.html) and the [tutorial from pyrtools](https://pyrtools.readthedocs.io/en/latest/tutorials/03_steerable_pyramids.html).
+The steerable pyramid can be thought of as a bank of oriented bandpass convolutional filters which span all orientations and frequencies. In this way, it is often thought of as having a representation similar to that of the primary visual cortex (V1). For an introduction to steerable pyramids, we recommend [plenoptic's user guide](https://docs.plenoptic.org/docs/tags/2.1.0/user_guide/models_and_metrics/Steerable_Pyramid.html) and the [tutorial from pyrtools](https://pyrtools.readthedocs.io/en/latest/tutorials/03_steerable_pyramids.html).
 
 ```{code-cell} ipython3
 import fenestration as fen
