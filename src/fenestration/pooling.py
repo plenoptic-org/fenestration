@@ -56,9 +56,9 @@ GAUSSIAN_SUM = 2 * 1.753314144021452772415339526931980189073725635759454989253 -
 def gaussian(x: float | np.ndarray, std_dev: float | None = 1) -> np.ndarray:
     r"""Compute simple gaussian with mean 0, and adjustable std dev.
 
-    Possible alternative window function, giving the weighting in each
+    Possible window function, giving the weighting in each
     direction for the spatial pooling performed during the construction
-    of visual metamers
+    of visual metamers.
 
     Parameters
     ----------
@@ -88,16 +88,16 @@ def gaussian(x: float | np.ndarray, std_dev: float | None = 1) -> np.ndarray:
     Summing at this location will give us the value we need to normalize
     by, :math:`S`. We work through this with :math:`\sigma=1`:
 
-    ..math::
+    .. math::
 
-        S &= 1 + 2 * \exp(\frac{-(1)^2}{2\sigma^2}) +
-        2 * \exp(\frac{-(2)^2}{2\sigma^2}) + ...
-        S &= 1 + 2 * \sum_{n=1}^{\inf} \exp({-n^2}{2})
-        S &= -1 + 2 * \sum_{n=0}^{\inf} \exp({-n^2}{2})
+        S &= 1 + 2 * \exp(\frac{-(1)^2}{2\sigma^2}) + 2 * \exp(\frac{-(2)^2}{2\sigma^2})
+         + ... \\
+        S &= 1 + 2 * \sum_{n=1}^{\inf} \exp(\frac{-n^2}{2}) \\
+        S &= -1 + 2 * \sum_{n=0}^{\inf} \exp(\frac{-n^2}{2})
 
     And we've stored this number as the constant ``GAUSSIAN_SUM`` (the
-    infinite sum computed in the equation above was using Wolfram Alpha,
-    https://www.wolframalpha.com/input/?i=sum+0+to+inf+e%5E%28-n%5E2%2F2%29+)
+    infinite sum computed in the equation above was computed using
+    `Wolfram Alpha <https://www.wolframalpha.com/input/?i=sum+0+to+inf+e%5E%28-n%5E2%2F2%29+>`_).
 
     When ``std_dev>1``, the windows overlap more. As with the
     probability density function of a normal distribution, we divide by
@@ -114,14 +114,9 @@ def raised_cosine(
 ) -> np.ndarray:
     r"""Compute raised cosine window function.
 
-    Used to give the weighting in each direction for the spatial pooling
-    performed during the construction of visual metamers
-
-    Notes
-    -----
-    For ``x`` values outside the function's domain, we return 0
-
-    Equation 9 from the online methods of [3]_.
+    Possible window function, giving the weighting in each
+    direction for the spatial pooling performed during the construction
+    of visual metamers.
 
     Parameters
     ----------
@@ -138,8 +133,14 @@ def raised_cosine(
 
     Raises
     ------
-    Exception
+    ValueError
         If ``transition_region_width`` is not between 0 and 1
+
+    Notes
+    -----
+    For ``x`` values outside the function's domain, we return 0
+
+    Equation 9 from the online methods of [3]_.
 
     References
     ----------
@@ -148,7 +149,7 @@ def raised_cosine(
 
     """
     if transition_region_width > 1 or transition_region_width < 0:
-        raise Exception("transition_region_width must lie between 0 and 1!")
+        raise ValueError("transition_region_width must lie between 0 and 1!")
     # doing it in this array-ized fashion is much faster
     y = torch.zeros_like(x)
     # this creates a bunch of masks
@@ -199,11 +200,7 @@ def _polar_angle_windows(
 ) -> torch.Tensor:
     r"""Create polar angle windows.
 
-    We require an integer number of windows placed between 0 and 2 pi.
-
-    Notes
-    -----
-    Equation 10 from the online methods of [4]_.
+    We require an integer number of windows placed between 0 and :math:`2 \pi`.
 
     Parameters
     ----------
@@ -236,10 +233,16 @@ def _polar_angle_windows(
 
     Raises
     ------
-    Exception
+    TypeError
         If ``n_windows`` is not an integer
-    Exception
+    ValueError
+        If ``n_windows=1``
+    ValueError
         If ``n_windows`` is not greater than 8*``std_dev``
+
+    Notes
+    -----
+    Equation 10 from the online methods of [4]_.
 
     References
     ----------
@@ -249,14 +252,14 @@ def _polar_angle_windows(
 
     """
     if int(n_windows) != n_windows:
-        raise Exception("n_windows must be an integer!")
+        raise TypeError("n_windows must be an integer!")
     if n_windows == 1:
-        raise Exception("We cannot handle one window correctly!")
+        raise ValueError("We cannot handle one window correctly!")
     # this is `w_\theta` in the paper
     window_spacing = calculate._angular_window_spacing(n_windows)
     max_angle = 2 * np.pi - window_spacing
     if window_type == "gaussian" and (std_dev * 8) > n_windows:
-        raise Exception(
+        raise ValueError(
             f"In order for windows to tile the circle correctly, n_windows ({n_windows}"
             f") must be greater than 8*std_dev ({8 * std_dev})!"
         )
@@ -415,15 +418,16 @@ def _log_eccentricity_windows(
 def create_pooling_windows(
     scaling: float | None,
     img_res: tuple[int, int],
-    min_eccentricity: float = 0.5,
-    max_eccentricity: float = 15,
+    min_ecc: float = 0.5,
+    max_ecc: float = 15,
     radial_to_circumferential_ratio: float = 2,
     window_type: Literal["cosine", "gaussian"] = "gaussian",
     transition_region_width: float | None = None,
     std_dev: float | None = 1,
     device: str | torch.device | None = None,
 ) -> tuple[torch.Tensor | dict, torch.Tensor | dict]:
-    r"""Create two sets of 2d pooling windows that span the visual field.
+    r"""
+    Create two sets of 2d pooling windows that span the visual field.
 
     This creates the pooling windows that we use to average image
     statistics for metamer generation as done in [6]_. This is returned
@@ -431,30 +435,30 @@ def create_pooling_windows(
 
     Note that these are returned separately as log-eccentricity and
     polar angle tensors and if you want the windows used in the paper
-    [6]_, you'll need to call ``torch.einsum`` (see Examples section)
-    or, better yet, use the ``PoolingWindows`` class, which is provided
+    [6]_, you'll need to call :func:`torch.einsum` (see Examples section)
+    or, better yet, use the :class:`PoolingWindows` class, which is provided
     for this purpose.
 
     Parameters
     ----------
     scaling
         The ratio of the eccentricity window's radial full-width at
-        half-maximum to eccentricity (see the `calculate.scaling` function).
+        half-maximum to eccentricity (see the :meth:`calculate.scaling` function).
     img_res
         2-tuple of ints specifying the resolution of the 2d images to
         make.
-    min_eccentricity
+    min_ecc
         The minimum eccentricity, the eccentricity below which we do not
         compute pooling windows (in degrees). Parameter :math:`e_0` in
         equation 11 of the online methods.
-    max_eccentricity
+    max_ecc
         The maximum eccentricity, the outer radius of the image (in
         degrees). Parameter :math:`e_r` in equation 11 of the online
         methods.
     radial_to_circumferential_ratio
         ``scaling`` determines the number of log-eccentricity windows we
         can create; this ratio gives us the number of polar angle
-        ones. Based on `scaling`, we calculate the width of the windows
+        ones. Based on ``scaling``, we calculate the width of the windows
         in log-eccentricity, and then divide that by this number to get
         their width in polar angle. Because we require an integer number
         of polar angle windows, we round the resulting number of polar
@@ -482,12 +486,25 @@ def create_pooling_windows(
         The 3d tensor of 2d polar angle windows. Its shape will be
         ``(n_angle_windows, *img_res)``, where the number of windows
         is inferred in this function based on the values of ``scaling``
-        and ``radial_to_circumferential_width``.
+        and ``radial_to_circumferential_ratio``.
     ecc_windows
         The 3d tensor of 2d log-eccentricity windows. Its shape will be
         ``(n_eccen_windows, *img_res)``, where the number of windows
         is inferred in this function based on the values of ``scaling``,
         ``min_ecc``, and ``max_ecc``.
+
+    See Also
+    --------
+    PoolingWindows : Generic class to set up and visualize foveated pooling windows
+
+    References
+    ----------
+    .. [6] Freeman, J., & Simoncelli, E. P. (2011). Metamers of the
+        ventral stream. Nature Neuroscience, 14(9),
+        1195–1201. http://dx.doi.org/10.1038/nn.2889
+    .. [7] Broderick, W. F., Rufo, G., Winawer, J. & Simoncelli, E. P.
+        (2023). Foveated metamers of the early visual system. eLife,
+        12:RP90554. http://dx.doi.org/10.7554/eLife.90554.2
 
     Examples
     --------
@@ -497,10 +514,10 @@ def create_pooling_windows(
 
     Although we have hard-coded the standard deviation (to 1, for
     ``window_type="gaussian"``) and transition region width (to 0.5, for
-    ``window_type="cosine"``) when creating the ``PoolingWindows`` object, it is
-    possible to manually adjust these parameters when using ``create_pooling_windows``.
-    However, only the default values have been tested! It is unclear whether the
-    windows will uniformly tile the images otherwise.
+    ``window_type="cosine"``) when creating the :class:`PoolingWindows` object, it is
+    possible to manually adjust these parameters when using
+    :meth:`create_pooling_windows`. However, only the default values have been tested!
+    It is unclear whether the windows will uniformly tile the images otherwise.
 
     To create gaussian windows (default), you can specify the following arguments:
 
@@ -508,8 +525,8 @@ def create_pooling_windows(
     >>> angle_w, ecc_w = fen.create_pooling_windows(
     ...     scaling=0.8,
     ...     img_res=(256, 256),
-    ...     min_eccentricity=1,
-    ...     max_eccentricity=10,
+    ...     min_ecc=1,
+    ...     max_ecc=10,
     ...     radial_to_circumferential_ratio=2,
     ...     window_type="gaussian",
     ...     transition_region_width=None,
@@ -522,8 +539,8 @@ def create_pooling_windows(
     >>> angle_w, ecc_w = fen.create_pooling_windows(
     ...     scaling=0.8,
     ...     img_res=(256, 256),
-    ...     min_eccentricity=1,
-    ...     max_eccentricity=10,
+    ...     min_ecc=1,
+    ...     max_ecc=10,
     ...     radial_to_circumferential_ratio=2,
     ...     window_type="cosine",
     ...     transition_region_width=0.5,
@@ -531,7 +548,7 @@ def create_pooling_windows(
     ...     device="cpu",
     ... )
 
-    To create equivalent windows to what is generated by ``fen.PoolingWindows``,
+    To create equivalent windows to what is generated by :class:`PoolingWindows`,
     you must also normalize resulting windows so they have an L1-norm of 1. This
     is useful when generating model metamers using the windows' representation
     so that each eccentricity contributes equally, facilitating optimization.
@@ -541,58 +558,45 @@ def create_pooling_windows(
     specified index:
 
     .. plot::
-       :include-source:
-       :context: close-figs
+        :include-source:
+        :context: close-figs
 
-       >>> import fenestration as fen
-       >>> import matplotlib.pyplot as plt
-       >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
-       >>> fig, ax = plt.subplots(1, 2, figsize=(8, 4))
-       >>> ax[0].imshow(ecc_w[0], cmap="Grays_r", interpolation="none")
-       <matplotlib.image.AxesImage ...>
-       >>> ax[1].imshow(angle_w[0], cmap="Grays_r", interpolation="none")
-       <matplotlib.image.AxesImage ...>
+        >>> import fenestration as fen
+        >>> import matplotlib.pyplot as plt
+        >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
+        >>> fig, ax = plt.subplots(1, 2, figsize=(8, 4))
+        >>> ax[0].imshow(ecc_w[0], cmap="Grays_r", interpolation="none")
+        <matplotlib.image.AxesImage ...>
+        >>> ax[1].imshow(angle_w[0], cmap="Grays_r", interpolation="none")
+        <matplotlib.image.AxesImage ...>
 
     If you wish to get the windows as shown in Supplementary Figure 1C
-    in the paper [6]_, use ``torch.einsum`` (if you wish to apply these
-    to images, use the ``PoolingWindows`` class instead, which has many
+    in the paper [6]_, use :func:`torch.einsum` (if you wish to apply these
+    to images, use the :class:`PoolingWindows` class instead, which has many
     more features):
 
     .. plot::
-       :include-source:
-       :context: close-figs
+        :include-source:
+        :context: close-figs
 
-       >>> import fenestration as fen
-       >>> import torch
-       >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
-       >>> # we ignore the last ring of eccentricity windows here because
-       >>> # they're all relatively small, which makes the following plot
-       >>> # look weird. for how to properly handle them, see the
-       >>> # PoolingWindows class
-       >>> windows = torch.einsum("ahw,ehw->eahw", [angle_w, ecc_w[:-1]]).flatten(0, 1)
-       >>> fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-       >>> # we use the intersecting amplitude value for gaussian windows, 0.14
-       >>> for w in windows:
-       ...     ax.contour(w, [0.14], colors="r")
-       <matplotlib.contour.QuadContourSet ...>
-
-    See Also
-    --------
-    fen.PoolingWindows : generate PoolingWindows object
-
-    References
-    ----------
-    .. [6] Freeman, J., & Simoncelli, E. P. (2011). Metamers of the
-       ventral stream. Nature Neuroscience, 14(9),
-       1195–1201. http://dx.doi.org/10.1038/nn.2889
-    .. [7] Broderick, W. F., Rufo, G., Winawer, J. & Simoncelli, E. P.
-       (2023). Foveated metamers of the early visual system. eLife,
-       12:RP90554. http://dx.doi.org/10.7554/eLife.90554.2
+        >>> import fenestration as fen
+        >>> import torch
+        >>> angle_w, ecc_w = fen.create_pooling_windows(0.8, (256, 256))
+        >>> # we ignore the last ring of eccentricity windows here because
+        >>> # they're all relatively small, which makes the following plot
+        >>> # look weird. for how to properly handle them, see the
+        >>> # PoolingWindows class
+        >>> windows = torch.einsum("ahw,ehw->eahw", [angle_w, ecc_w[:-1]]).flatten(0, 1)
+        >>> fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+        >>> # we use the intersecting amplitude value for gaussian windows, 0.14
+        >>> for w in windows:
+        ...     ax.contour(w, [0.14], colors="r")
+        <matplotlib.contour.QuadContourSet ...>
 
 
     """
     ecc_window_spacing = calculate._eccentricity_window_spacing(
-        min_eccentricity, max_eccentricity, scaling=scaling, std_dev=std_dev
+        min_ecc, max_ecc, scaling=scaling, std_dev=std_dev
     )
     n_polar_windows = calculate._angular_n_windows(
         ecc_window_spacing / radial_to_circumferential_ratio
@@ -613,8 +617,8 @@ def create_pooling_windows(
         img_res,
         None,
         ecc_window_spacing,
-        min_eccentricity,
-        max_eccentricity,
+        min_ecc,
+        max_ecc,
         window_type,
         std_dev=std_dev,
         transition_region_width=transition_region_width,
@@ -663,9 +667,9 @@ def normalize_windows(
         the normalized ecc_windows.
     scale_factor
         the scale_factor used to normalize eccentricity windows
-        (as a 3d tensor, number of eccentricity windows by 1 by
-        1). stored by ``PoolingWindows`` object so we can undo it for
-        ``project()`` or plotting purposes
+        (as a 3d tensor, number of eccentricity windows by 1 by 1). Stored by
+        :class:`~fenestration.PoolingWindows` object so we can undo it for
+        :meth:`~fenestration.PoolingWindows.project` or plotting purposes.
 
     """
     # pick some window with a middling eccentricity

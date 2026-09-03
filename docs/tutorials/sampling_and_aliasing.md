@@ -6,7 +6,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.17.3
 kernelspec:
-  display_name: pooling
+  display_name: fenestration
   language: python
   name: python3
 ---
@@ -83,6 +83,7 @@ plt.close()
 anim
 ```
 
+(unsuccessful-sampling)=
 ## Unsuccessful sampling
 
 Alright, that was pretty boring, so let's do this whole thing again, but with sparser sampling and see that the interpolation does not look as good.
