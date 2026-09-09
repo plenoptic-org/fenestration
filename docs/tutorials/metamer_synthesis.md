@@ -56,13 +56,14 @@ rcContext = {
 
 ## Loading in images
 
-We begin by using plenoptic's [data](https://docs.plenoptic.org/docs/tags/2.1.0/api/images.html) and [plotting](https://docs.plenoptic.org/docs/tags/2.1.0/api/plot.html) functions to grab two images. Since these images are very different in terms of spatial frequency and structure, it will help us visualize the resulting metamers.
+We begin by using plenoptic's [data](https://docs.plenoptic.org/docs/tags/2.1.0/api/images.html) and [plotting](https://docs.plenoptic.org/docs/tags/2.1.0/api/plot.html) functions to grab two images. Since these images are very different in terms of spatial frequency and structure, it will help us visualize the resulting metamers. We also downsample the images slightly in order to reduce memory consumption with the synthesis processes, but the results are very similar with both sizes.
 
 ```{code-cell} ipython3
 reptile_orig = po.data.reptile_skin()
 einstein_orig = po.data.einstein()
 reptile = F.interpolate(reptile_orig, size=(200,200))
 einstein = F.interpolate(einstein_orig, size=(200,200))
+po.plot.imshow([reptile_orig, einstein_orig]);
 po.plot.imshow([reptile, einstein]);
 ```
 
