@@ -38,6 +38,7 @@ Here we provide a tutorial for using {class}`~fenestration.PoolingWindows` to cr
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import torch
+import torch.nn.functional as F
 
 import fenestration as fen
 import plenoptic as po
@@ -58,8 +59,10 @@ rcContext = {
 We begin by using plenoptic's [data](https://docs.plenoptic.org/docs/tags/2.1.0/api/images.html) and [plotting](https://docs.plenoptic.org/docs/tags/2.1.0/api/plot.html) functions to grab two images. Since these images are very different in terms of spatial frequency and structure, it will help us visualize the resulting metamers.
 
 ```{code-cell} ipython3
-reptile = po.data.reptile_skin()
-einstein = po.data.einstein()
+reptile_orig = po.data.reptile_skin()
+einstein_orig = po.data.einstein()
+reptile = F.interpolate(reptile_orig, size=(200,200))
+einstein = F.interpolate(einstein_orig, size=(200,200))
 po.plot.imshow([reptile, einstein]);
 ```
 
@@ -90,9 +93,9 @@ Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model wo
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
-met_reptile.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
+met_reptile.synthesize(max_iter=500, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
-met_einstein.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
+met_einstein.synthesize(max_iter=500, stop_criterion=1e-6);
 ```
 
 We see that the loss has converged, great! Let's check out our metamers and plot the loss and error across each iteration. Since the model only cares about the average pixel values in each window, the metamer will also maintain the corresponding average pixel values in each window region, but does not "see" the noise in the generated image. Also note how the correspondence to the original image changes based on eccentricity due to the increasing window sizes.
@@ -124,8 +127,8 @@ Also note the warning that we get now about some windows being smaller than a pi
 ```{code-cell} ipython3
 fig = po.plot.imshow(reptile, title=None)
 model.plot_windows(ax=fig.axes[0], origin="upper");
-plt.xlim(128,180);
-plt.ylim(102,152);
+plt.xlim(95,125);
+plt.ylim(85,115);
 ```
 
 Despite this, we can still generate our metamer! Since we are using smaller windows, we can see finer-grained details of the original image across a wider range of the metamer.
@@ -134,9 +137,9 @@ Despite this, we can still generate our metamer! Since we are using smaller wind
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
-met_reptile.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
+met_reptile.synthesize(max_iter=500, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
-met_einstein.synthesize(store_progress=True, max_iter=500, stop_criterion=1e-6);
+met_einstein.synthesize(max_iter=500, stop_criterion=1e-6);
 
 po.plot.synthesis_status(met_reptile);
 po.plot.synthesis_status(met_einstein);
@@ -167,7 +170,7 @@ Now let's perform the synthesis for the cosine windows. Here we can clearly see 
 model_cosine.eval()
 po.remove_grad(model_cosine)
 met_cosine = po.Metamer(einstein, model_cosine)
-met_cosine.synthesize(store_progress=True, max_iter=200, stop_criterion=1e-6);
+met_cosine.synthesize(max_iter=200, stop_criterion=1e-6);
 
 po.plot.synthesis_status(met_einstein);
 po.plot.synthesis_status(met_cosine);
