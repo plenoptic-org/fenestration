@@ -39,7 +39,7 @@ This notebook requires the optional dependency `plenoptic`, which can be install
 
 ```
 
-In this tutorial, we will show how `fenestration` can be used on dictionaries of 4d tensors, like the output of steerable pyramids. Here, we will use the [SteerablePyramidFreq](https://docs.plenoptic.org/docs/tags/2.1.0/api/generated/plenoptic.process.SteerablePyramidFreq.html#plenoptic.process.SteerablePyramidFreq) process from [plenoptic](https://docs.plenoptic.org/docs/tags/2.1.0/index.html).
+In this tutorial, we will show how `fenestration` can be used on dictionaries of 4d tensors, like the output of steerable pyramids. Here, we will use the [SteerablePyramidFreq](https://docs.plenoptic.org/docs/tags/2.1.0/api/generated/plenoptic.process.SteerablePyramidFreq.html#plenoptic.process.SteerablePyramidFreq) object from [plenoptic](https://docs.plenoptic.org/docs/tags/2.1.0/index.html).
 
 The steerable pyramid can be thought of as a bank of oriented bandpass convolutional filters which span all orientations and frequencies. In this way, it is often thought of as having a representation similar to that of the primary visual cortex (V1). For an introduction to steerable pyramids, we recommend [plenoptic's user guide](https://docs.plenoptic.org/docs/tags/2.1.0/user_guide/models_and_metrics/Steerable_Pyramid.html) and the [tutorial from pyrtools](https://pyrtools.readthedocs.io/en/latest/tutorials/03_steerable_pyramids.html).
 
@@ -74,7 +74,7 @@ print(pyr_coeffs.keys())
 print(pyr_coeffs[0].shape)
 ```
 
-We can visualize these coefficient outputs using `po.plot.pyrshow`. Each plot shows the coefficients for a given scale and orientation band. Height 00 shows the finest scales with high spatial frequencies and we can see the spatial frequencies decrease as we move down the rows. Each column shows a given orientation ("band"), with vertical in the first column, horizontal in the third, and the diagonals in the second and fourth. Finally, the residuals at the very bottom of the plot show the high and low frequencies, respectively, which are not captured by the pyramid.
+We can visualize these coefficient outputs using `po.plot.pyrshow`. Each plot shows the coefficients for a given scale and orientation band. Height 00 shows the finest scales with high spatial frequencies and we can see the spatial frequencies decrease as we move down the rows. Each column shows a given orientation ("band"), with vertical in the first column, horizontal in the third, and the diagonals in the second and fourth. Finally, the plots at the very bottom of the figure show the residuals, the highest and lowest frequencies, respectively, which are not captured by the pyramid.
 
 ```{code-cell} ipython3
 po.plot.pyrshow(pyr_coeffs);
