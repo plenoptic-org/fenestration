@@ -9,5 +9,6 @@ generate_windows.md
 sampling_and_aliasing.md
 compare_gaussian_cosine.md
 metamer_synthesis.md
+steerable_pyramid.md
 
 ```
