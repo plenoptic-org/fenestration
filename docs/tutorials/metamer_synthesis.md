@@ -93,10 +93,10 @@ Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model wo
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
-met_reptile.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 1})
+met_reptile.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 0.1})
 met_reptile.synthesize(max_iter=200, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
-met_einstein.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 1})
+met_einstein.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 0.1})
 met_einstein.synthesize(max_iter=200, stop_criterion=1e-6);
 ```
 
