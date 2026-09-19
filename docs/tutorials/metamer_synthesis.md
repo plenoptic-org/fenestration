@@ -93,11 +93,11 @@ Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model wo
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
-met_reptile.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 0.1})
-met_reptile.synthesize(max_iter=200, stop_criterion=1e-6);
+met_reptile.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 0.2})
+met_reptile.synthesize(max_iter=400, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
-met_einstein.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 0.1})
-met_einstein.synthesize(max_iter=200, stop_criterion=1e-6);
+met_einstein.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 0.2})
+met_einstein.synthesize(max_iter=400, stop_criterion=1e-6);
 ```
 
 It looks like the loss is starting to converge! Let's check out our metamers and plot the loss and error across each iteration using a [function from plenoptic](https://docs.plenoptic.org/docs/tags/2.1.0/api/generated/plenoptic.plot.synthesis_status.html#plenoptic.plot.synthesis_status).
