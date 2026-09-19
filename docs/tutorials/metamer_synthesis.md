@@ -94,8 +94,10 @@ Now that we have reviewed how the {class}`~fenestration.PoolingWindows` model wo
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
+met_reptile.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 1})
 met_reptile.synthesize(max_iter=500, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
+met_einstein.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 1})
 met_einstein.synthesize(max_iter=500, stop_criterion=1e-6);
 ```
 
@@ -138,9 +140,11 @@ Despite this, we can still generate our metamer! Since we are using smaller wind
 model.eval()
 po.remove_grad(model)
 met_reptile = po.Metamer(reptile, model)
-met_reptile.synthesize(max_iter=500, stop_criterion=1e-6);
+met_reptile.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 1})
+met_reptile.synthesize(max_iter=200, stop_criterion=1e-6);
 met_einstein = po.Metamer(einstein, model)
-met_einstein.synthesize(max_iter=500, stop_criterion=1e-6);
+met_einstein.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 1})
+met_einstein.synthesize(max_iter=200, stop_criterion=1e-6);
 
 po.plot.synthesis_status(met_reptile);
 po.plot.synthesis_status(met_einstein);
@@ -171,6 +175,7 @@ Now let's perform the synthesis for the cosine windows. Here we can clearly see 
 model_cosine.eval()
 po.remove_grad(model_cosine)
 met_cosine = po.Metamer(einstein, model_cosine)
+met_cosine.setup(optimizer=torch.optim.LBFGS, optimizer_kwargs={"lr": 1})
 met_cosine.synthesize(max_iter=200, stop_criterion=1e-6);
 
 po.plot.synthesis_status(met_einstein);
