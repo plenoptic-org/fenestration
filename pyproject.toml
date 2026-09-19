@@ -21,6 +21,7 @@ dependencies = [
     "torch>=1.4",
     "matplotlib>=3.3",
     "opt_einsum>=3.3",
+    "tqdm>=4.29",
 ]
 
 [build-system]
@@ -43,6 +44,7 @@ docs = [
     "myst-nb",
     "jupytext",
     "plenoptic>=2.0.1",
+    "ipywidgets",
 ]
 
 [tool.setuptools.packages.find]
