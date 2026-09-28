@@ -118,13 +118,13 @@ po.plot.synthesis_status(met_einstein);
 
 Since the model only cares about the average pixel values in each window, the metamer will have the same average pixel values in each window region as the original image, but the model does not "see" the noise in the generated metamer image. Also note how the similarity to the original image changes based on eccentricity: while the very center of the metamer looks like a noisy version of the original image, as the windows grow larger, more and more details are lost.
 
-We can confirm this by comparing the window values of the original image with those of the synthesized metamer:
+We can confirm this by comparing the window values of the original image with those of the synthesized metamer. We can see that these two plots are the same and thus our synthesized image is a model metamer to the original reptile image.
 
 ```{code-cell} ipython3
 with plt.rc_context(rcContext):
-    fig, axes = plt.subplots(1, 2, figsize=(20,10), layout="tight", sharex="all", sharey="all")
-    model.plot_window_values(reptile, ax=axes[0], subset=False)
-    model.plot_window_values(met_reptile.metamer, ax=axes[1], subset=False)
+    fig, axes = plt.subplots(1, 2, figsize=(20,10), layout="tight")
+    model.plot_window_values(reptile, ax=axes[0], subset=False, origin="upper")
+    model.plot_window_values(met_reptile.metamer, ax=axes[1], subset=False, origin="upper")
 ```
 
 ## Changing Scaling Values
@@ -155,7 +155,7 @@ plt.ylim(85,115);
 
 Despite this, we can still generate our metamer because all pixels within the radius of `self.calculated_min_eccentricity_degrees` will be matched exactly between the metamer and the original image.
 
-Since we are using smaller windows, we can see finer-grained details of the original image across a wider range of the metamer. This is the same setup as the previous metamr synthesis, just with a higher learning rate.
+Since we are using smaller windows, we can see finer-grained details of the original image across a wider range of the metamer. This is the same setup as the previous metamer synthesis, just with a higher learning rate.
 
 ```{code-cell} ipython3
 model.eval()
@@ -169,6 +169,15 @@ met_einstein.synthesize(max_iter=200, stop_criterion=1e-6);
 
 po.plot.synthesis_status(met_reptile);
 po.plot.synthesis_status(met_einstein);
+```
+
+Again we can plot the window values of the original and synthesized images and see that these two plots are the same and thus our synthesized image is a model metamer to the original reptile image.
+
+```{code-cell} ipython3
+with plt.rc_context(rcContext):
+    fig, axes = plt.subplots(1, 2, figsize=(20,10), layout="tight")
+    model.plot_window_values(reptile, ax=axes[0], subset=False, origin="upper")
+    model.plot_window_values(met_reptile.metamer, ax=axes[1], subset=False, origin="upper")
 ```
 
 ## Comparing Window Types
@@ -201,6 +210,15 @@ met_cosine.synthesize(max_iter=200, stop_criterion=1e-6);
 
 po.plot.synthesis_status(met_einstein);
 po.plot.synthesis_status(met_cosine);
+```
+
+Despite this ringing effect, the window values of the original and synthesized images are still the same, confirming again that the synthesized image with cosine windows is a model metamer to the original einstein image.
+
+```{code-cell} ipython3
+with plt.rc_context(rcContext):
+    fig, axes = plt.subplots(1, 2, figsize=(20,10), layout="tight")
+    model_cosine.plot_window_values(einstein, ax=axes[0], subset=False, origin="upper")
+    model_cosine.plot_window_values(met_cosine.metamer, ax=axes[1], subset=False, origin="upper")
 ```
 
 ## Conclusion
