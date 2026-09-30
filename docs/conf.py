@@ -79,6 +79,9 @@ add_function_parentheses = False
 # Enable automatic stub page generation
 autosummary_generate = True
 
+# max time (in secs) per notebook cell. here, we disable this
+nb_execution_timeout = -1
+
 
 # the following is copied from plenoptic:
 # https://github.com/plenoptic-org/plenoptic/blob/0a28fa537f6ce650f1e76d4035429cd7a6d959c1/docs/conf.py#L409

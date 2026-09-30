@@ -30,6 +30,7 @@ Download the executed notebook: **{nb-download}`steerable_pyramid.ipynb`**!
 
 ```
 
+(steerable-pyramids-nb)=
 # Steerable Pyramids
 
 ```{admonition} Warning

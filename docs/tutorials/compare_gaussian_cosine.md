@@ -30,6 +30,7 @@ Download the executed notebook: **{nb-download}`compare_gaussian_cosine.ipynb`**
 
 ```
 
+(compare-window-types)=
 # Comparing Gaussian and Cosine Windows
 
 ```{admonition} Warning
